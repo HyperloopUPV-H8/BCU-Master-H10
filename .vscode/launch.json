@@ -41,7 +41,6 @@
         "source": "probe",
         "decoders": [{ "type": "console", "label": "ITM", "port": 0 }]
       },
-      "stm32cubeprogrammer": "/opt/st/stm32cubeclt_1.16.0/STM32CubeProgrammer/bin"
     },
     {
       "name": "Debug simulator on Rosetta",
