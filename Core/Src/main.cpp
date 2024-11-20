@@ -4,13 +4,13 @@
 #include "lwip.h"
 #endif
 
-#include "ST-LIB.hpp"
+#include "BCU/BCU.hpp"
 
 int main(void) {
-    STLIB::start();
+    BCU::BCU bcu = BCU::BCU();
 
     while (1) {
-        STLIB::update();
+        bcu.update();
     }
 }
 
