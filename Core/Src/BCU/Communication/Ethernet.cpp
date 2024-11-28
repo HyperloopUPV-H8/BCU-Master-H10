@@ -10,8 +10,10 @@ const uint32_t BCU::Communication::Ethernet::UDPPort{50400};
 ServerSocket *BCU::Communication::Ethernet::ControlStationOrders{};
 DatagramSocket *BCU::Communication::Ethernet::ControlStationData{};
 
-Order *BCU::Communication::Ethernet::Orders[3]{};
+Packet *BCU::Communication::Ethernet::Packets[1]{};
+Order *BCU::Communication::Ethernet::Orders[4]{};
 
 bool BCU::Communication::Ethernet::open_contactors_received{false};
 bool BCU::Communication::Ethernet::close_main_circuit_received{false};
 bool BCU::Communication::Ethernet::close_active_discharge_received{false};
+bool BCU::Communication::Ethernet::request_data_received{false};

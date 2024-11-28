@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 3.14)
 project (BCU-Master ASM C CXX)
 set(EXECUTABLE ${PROJECT_NAME}.elf)
 set(STLIB_DIR ${CMAKE_CURRENT_LIST_DIR}/deps/ST-LIB)
+set(CMSLIB_DIR ${CMAKE_CURRENT_LIST_DIR}/deps/CMS-LIB)
 
 option(USE_ETHERNET "Enable ethernet peripheral" OFF)
 option(TARGET_NUCLEO "Targets the STM32H723 Nucleo development board" OFF)
@@ -26,6 +27,8 @@ endif()
 
 set(STLIB_NAME_SUFFIX master)
 add_subdirectory(${STLIB_DIR})
+set(CMSLIB_NAME_SUFFIX master)
+add_subdirectory(${CMSLIB_DIR})
 
 set(HAL_HEADER 
   ${CMAKE_CURRENT_LIST_DIR}/Core/Inc/main.h
@@ -70,6 +73,7 @@ ${SOURCE_CPP}
 
 target_link_libraries(${EXECUTABLE} PRIVATE 
   ${STLIB_LIBRARY}
+  ${CMSLIB_LIBRARY}
   $<$<NOT:$<BOOL:${CMAKE_CROSSCOMPILING}>>:GTest::gtest_main>
 )
 
@@ -137,6 +141,9 @@ target_include_directories(${EXECUTABLE} PRIVATE
   ${STLIB_DIR}/Inc
   ${STLIB_DIR}/Inc/ST-LIB_LOW
   ${STLIB_DIR}/Inc/ST-LIB_HIGH
+  ${CMSLIB_DIR}/Inc
+  ${CMSLIB_DIR}/Inc/Models
+  ${CMSLIB_DIR}/Inc/C++Utilities
 )
 
 target_link_options(${EXECUTABLE} PRIVATE 
