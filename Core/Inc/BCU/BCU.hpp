@@ -2,6 +2,7 @@
 
 #include "BCU/Actuators/Contactors.hpp"
 #include "BCU/Communication/Ethernet.hpp"
+#include "BCU/Communication/FDCAN.hpp"
 #include "ST-LIB.hpp"
 
 namespace BCU {
@@ -30,6 +31,7 @@ class BCU {
 
     BCU() {
         contactors = Actuators::Contactors();
+        Communication::FDCAN::initialize();
         STLIB::start(IPV4("192.168.0.15"), IPV4("255.255.255.0"),
                      IPV4("192.168.0.1"), UART::uart2);
         Communication::Ethernet::initialize();

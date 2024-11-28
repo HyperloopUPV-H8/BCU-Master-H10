@@ -20,6 +20,7 @@ void BCU::BCU::initialize_state_machine() {
 void BCU::BCU::update() {
     STLIB::update();
     GeneralStateMachine.check_transitions();
+    Communication::FDCAN::update();
     switch (GeneralStateMachine.current_state) {
         case GeneralStates::Connecting:
             update_connecting();
@@ -44,6 +45,12 @@ void BCU::BCU::update_operational() {
     } else if (Communication::Ethernet::close_active_discharge_received) {
         contactors.close_active_discharge();
         Communication::Ethernet::reset_contactor_orders_received();
+    }
+
+    if (Communication::Ethernet::request_data_received) {
+        Communication::FDCAN::request_data_to(
+            1, CMS::DataRequestFlags::SendModuleState, 0);
+        Communication::Ethernet::request_data_received = false;
     }
 }
 void BCU::BCU::update_fault() {}
