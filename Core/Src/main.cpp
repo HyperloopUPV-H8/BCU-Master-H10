@@ -10,19 +10,10 @@ using enum CMS::DataRequestFlags;
 bool transmit_can = false;
 int main(void) {
     BCU::BCU bcu = BCU::BCU();
-    //BCU::Communication::FDCAN::request_all_data(EnableAutoTx | SendCellsVoltage,1000);
-    char data[8] = {
-    0x55,0x55,0x55,0x55,
-    0x55,0x55,0x55,0x55
-    };
-    Time::register_low_precision_alarm(1000,[&](){
-        transmit_can = true;
-    });
+    BCU::Communication::FDCAN::request_all_data(EnableAutoTx | SendCellsVoltage,1000);
+
     while (1) {
-        if(transmit_can){
-            transmit_can = false;
-            FDCAN::transmit(0,85,&data[0],FDCAN::BYTES_8);
-        }
+
         bcu.update();
     }
 }
