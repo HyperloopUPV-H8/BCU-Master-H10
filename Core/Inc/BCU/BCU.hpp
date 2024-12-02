@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BCU/Actuators/Contactors.hpp"
+#include "BCU/Sensors/SuperCapacitors.hpp"
 #include "BCU/Communication/Ethernet.hpp"
 #include "BCU/Communication/FDCAN.hpp"
 #include "ST-LIB.hpp"
