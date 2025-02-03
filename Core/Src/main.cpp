@@ -6,7 +6,6 @@
 
 #include "BCU/BCU.hpp"
 
-using enum CMS::DataRequestFlags;
 bool transmit_can = false;
 int main(void) {
     BCU::Board bcu;
