@@ -9,11 +9,9 @@
 using enum CMS::DataRequestFlags;
 bool transmit_can = false;
 int main(void) {
-    BCU::BCU bcu = BCU::BCU();
-    BCU::Communication::FDCAN::request_all_data(EnableAutoTx | SendCellsVoltage,1000);
+    BCU::Board bcu;
 
     while (1) {
-
         bcu.update();
     }
 }

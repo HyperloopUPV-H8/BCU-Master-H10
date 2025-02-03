@@ -1,17 +1,12 @@
 #pragma once
 
-#include "BCU/Communication/FDCAN.hpp"
+#include "CMS-LIB.hpp"
 
 namespace BCU::Sensors {
 class SuperCapacitors {
-   private:
    public:
-    static float get_total_voltage() {
-        using BCU::Communication::ModuleCAN;
+    static const std::array<float &, 3> module_voltages;
 
-        return ModuleCAN::strings[1].modules[1].module_voltage +
-               ModuleCAN::strings[1].modules[2].module_voltage +
-               ModuleCAN::strings[1].modules[3].module_voltage;
-    }
+    inline static float calculate_total_voltage();
 };
 }  // namespace BCU::Sensors

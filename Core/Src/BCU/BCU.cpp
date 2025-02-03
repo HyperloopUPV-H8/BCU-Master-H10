@@ -1,70 +1,52 @@
 #include "BCU/BCU.hpp"
 
-void BCU::BCU::initialize_state_machine() {
-    GeneralStateMachine = StateMachine(GeneralStates::Connecting);
+void BCU::Board::initialize_state_machine() {
+    GeneralStateMachine = StateMachine(GeneralStates::Idle);
+    GeneralStateMachine.add_state(GeneralStates::Connecting);
     GeneralStateMachine.add_state(GeneralStates::Operational);
     GeneralStateMachine.add_state(GeneralStates::Fault);
 
+    ProtectionManager::link_state_machine(GeneralStateMachine,
+                                          GeneralStates::Fault);
+
+    GeneralStateMachine.add_transition(GeneralStates::Idle,
+                                       GeneralStates::Connecting, has_started);
+
     GeneralStateMachine.add_transition(
         GeneralStates::Connecting, GeneralStates::Operational, is_connected);
+
     GeneralStateMachine.add_transition(
         GeneralStates::Operational, GeneralStates::Fault, has_failed_precharge);
-    GeneralStateMachine.add_transition(GeneralStates::Operational,
-                                       GeneralStates::Fault,
-                                       has_failed_active_discharge);
 
-    GeneralStateMachine.add_enter_action([&]() { contactors.open_all(); },
+    GeneralStateMachine.add_enter_action([&]() { leds.signal_connecting(); },
+                                         GeneralStates::Connecting);
+
+    GeneralStateMachine.add_enter_action([&]() { leds.signal_operational(); },
+                                         GeneralStates::Operational);
+
+    GeneralStateMachine.add_enter_action([&]() { 
+        contactors.open(); },
                                          GeneralStates::Fault);
+
+    Time::register_low_precision_alarm(100,
+                                       [&]() { send_supercaps_data = true; });
 }
 
-void BCU::BCU::update() {
-    STLIB::update();
+void BCU::Board::start() { Communication::FDCAN::start(); }
+
+void BCU::Board::update() {
     GeneralStateMachine.check_transitions();
+    Communication::Ethernet::update();
     Communication::FDCAN::update();
-    switch (GeneralStateMachine.current_state) {
-        case GeneralStates::Connecting:
-            update_connecting();
-            break;
-        case GeneralStates::Operational:
-            update_operational();
-            break;
-        case GeneralStates::Fault:
-            update_fault();
-            break;
+    if (send_supercaps_data) {
+        Communication::Ethernet::send_supercaps_data();
+        send_supercaps_data = false;
     }
+    STLIB::update();
 }
 
-void BCU::BCU::update_connecting() {}
-void BCU::BCU::update_operational() {
-    if (Communication::Ethernet::open_contactors_received) {
-        contactors.open_all();
-        Communication::Ethernet::reset_contactor_orders_received();
-    } else if (Communication::Ethernet::close_main_circuit_received) {
-        contactors.close_with_precharge();
-        Communication::Ethernet::reset_contactor_orders_received();
-    } else if (Communication::Ethernet::close_active_discharge_received) {
-        contactors.close_active_discharge();
-        Communication::Ethernet::reset_contactor_orders_received();
-    }
+bool BCU::Board::has_failed_precharge() { return false; }
 
-    if (Communication::Ethernet::request_data_received) {
-        Communication::FDCAN::request_data_to(
-            1, CMS::DataRequestFlags::SendModuleState, 0);
-        Communication::Ethernet::request_data_received = false;
-    }
-}
-void BCU::BCU::update_fault() {}
-
-bool BCU::BCU::has_failed_precharge() {
-    return Actuators::Contactors::LastPrechargeStatus ==
-           Actuators::Contactors::PrechargeStatus::Failed;
-}
-
-bool BCU::BCU::has_failed_active_discharge() {
-    return Actuators::Contactors::LastActiveDischargeStatus ==
-           Actuators::Contactors::ActiveDischargeStatus::Failed;
-}
-
-bool BCU::BCU::is_connected() {
+bool BCU::Board::is_connected() {
     return Communication::Ethernet::is_connected();
 }
