@@ -1,6 +1,8 @@
 #pragma once
 
-#include "BCU/Communication/ModuleCAN.hpp"
+#include "BCU/Communication/Data.hpp"
+#include "BCU/Communication/Orders.hpp"
+#include "CMS-LIB.hpp"
 #include "ST-LIB.hpp"
 
 namespace BCU::Communication {
@@ -10,15 +12,15 @@ class Ethernet {
      * Socket Definition *
      *********************/
 
-    const static IPV4 LocalIP;
-    const static IPV4 BackendIP;
+    inline const static IPV4 LocalIP{"192.168.0.15"};
+    inline const static IPV4 BackendIP{"192.168.0.9"};
 
-    const static uint32_t TCPServerPort;
-    const static uint32_t TCPClientPort;
-    const static uint32_t UDPPort;
+    inline const static uint32_t TCPServerPort{50500};
+    inline const static uint32_t TCPClientPort{50401};
+    inline const static uint32_t UDPPort{50400};
 
-    static ServerSocket *ControlStationOrders;
-    static DatagramSocket *ControlStationData;
+    inline static ServerSocket *ControlStationOrders{nullptr};
+    inline static DatagramSocket *ControlStationData{nullptr};
 
     static void initialize_sockets() {
         ControlStationOrders = new ServerSocket(LocalIP, TCPServerPort);
@@ -30,68 +32,48 @@ class Ethernet {
      * Packet Definition *
      *********************/
 
-    static Packet *Packets[1];
-
-    constexpr static uint16_t Module1CellsOverviewPacketId{999};
+    inline static std::array<Packet *, 4> Packets{};
 
     static void initialize_data() {
-        CMS::Module &module1{ModuleCAN::strings[1].modules[1]};
-
-        Packets[0] = new StackPacket(
-            Module1CellsOverviewPacketId, &module1.module_voltage,
-            &module1.max_cell_voltage, &module1.mean_cell_voltage,
-            &module1.min_cell_voltage);
+        Packets[0] = Data::generate_module_state_packet(999, 1);
+        Packets[1] = Data::generate_module_state_packet(998, 2);
+        Packets[2] = Data::generate_module_state_packet(997, 3);
+        Packets[3] = new StackPacket(
+            996, &Communication::FDCAN::supercaps.system.total_voltage_volts);
     }
 
     /********************
      * Order Definition *
      ********************/
 
-    static Order *Orders[4];
-
-    constexpr static uint16_t OpenContactorsOrderId{900};
-    constexpr static uint16_t CloseMainCircuitOrderId{901};
-    constexpr static uint16_t CloseActiveDischargeOrderId{902};
-    constexpr static uint16_t RequestDataToModule1OrderId{903};
-
     static void initialize_orders() {
-        Orders[0] =
-            new StackOrder(OpenContactorsOrderId, open_contactors_callback);
-        Orders[1] = new StackOrder(CloseMainCircuitOrderId,
-                                   close_main_circuit_callback);
-        Orders[2] = new StackOrder(CloseActiveDischargeOrderId,
-                                   close_active_discharge_callback);
-        Orders[3] =
-            new StackOrder(RequestDataToModule1OrderId, request_data_callback);
+        Orders::RestartSupercaps();
+        Orders::OpenContactors();
+        Orders::CloseContactors();
     }
-
-    static void open_contactors_callback() { open_contactors_received = true; }
-    static void close_main_circuit_callback() {
-        close_main_circuit_received = true;
-    }
-    static void close_active_discharge_callback() {
-        close_active_discharge_received = true;
-    }
-    static void request_data_callback() { request_data_received = true; }
 
    public:
-    static bool open_contactors_received;
-    static bool close_main_circuit_received;
-    static bool close_active_discharge_received;
-
-    static bool request_data_received;
-
-    static void reset_contactor_orders_received() {
-        open_contactors_received = false;
-        close_main_circuit_received = false;
-        close_active_discharge_received = false;
-    }
-
     static void initialize() {
         initialize_sockets();
         initialize_orders();
+        initialize_data();
     }
 
     static bool is_connected() { return ControlStationOrders->is_connected(); }
+
+    static bool update() {
+        Orders::OpenContactors::update();
+        Orders::CloseContactors::update();
+        Orders::RestartSupercaps::update();
+
+        return true;
+    }
+
+    static void send_supercaps_data() {
+        ControlStationData->send_packet(*Packets[0]);
+        ControlStationData->send_packet(*Packets[1]);
+        ControlStationData->send_packet(*Packets[2]);
+        ControlStationData->send_packet(*Packets[3]);
+    }
 };
 }  // namespace BCU::Communication

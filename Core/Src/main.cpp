@@ -14,10 +14,10 @@ int main(void) {
 #endif
 
     BCU::BCU bcu = BCU::BCU();
-    BCU::Communication::FDCAN::request_all_data(EnableAutoTx | SendCellsVoltage,1000);
+    BCU::Communication::FDCAN::request_all_data(EnableAutoTx | SendCellsVoltage,
+                                                1000);
 
     while (1) {
-
         bcu.update();
     }
 }
