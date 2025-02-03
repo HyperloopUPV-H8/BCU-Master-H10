@@ -6,8 +6,9 @@
 
 #include "BCU/BCU.hpp"
 
+bool transmit_can = false;
 int main(void) {
-    BCU::BCU bcu = BCU::BCU();
+    BCU::Board bcu;
 
     while (1) {
         bcu.update();

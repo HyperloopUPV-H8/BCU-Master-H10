@@ -1,13 +1,12 @@
 #pragma once
 
+#include "CMS-LIB.hpp"
+
 namespace BCU::Sensors {
 class SuperCapacitors {
-   private:
    public:
-    static float module_voltage[3];
+    static const std::array<float &, 3> module_voltages;
 
-    static float get_total_voltage() {
-        return module_voltage[0] + module_voltage[1] + module_voltage[2];
-    }
+    inline static float calculate_total_voltage();
 };
 }  // namespace BCU::Sensors

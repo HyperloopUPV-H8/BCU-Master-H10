@@ -7,63 +7,60 @@ namespace BCU::Actuators {
 using namespace BCU;
 class Contactors {
    private:
-    DigitalOutput ContactorHigh;
-    DigitalOutput ContactorPrecharge;
-    DigitalOutput ContactorActiveDischarge;
-#if USING_CONTACTOR_LOW
-    DigitalOutput ContactorLow;
+    class NormallyOpenContactor {
+        DigitalOutput output;
+
+       public:
+        NormallyOpenContactor(Pin& pin) : output(pin) {}
+
+        void close() { output.turn_on(); }
+        void open() { output.turn_off(); }
+        void to_normal_state() { open(); }
+    };
+
+    class NormallyClosedContactor {
+        DigitalOutput output;
+
+       public:
+        NormallyClosedContactor(Pin& pin) : output(pin) {}
+
+        void close() { output.turn_off(); }
+        void open() { output.turn_on(); }
+        void to_normal_state() { close(); }
+    };
+
+    NormallyOpenContactor contactor_high_side;
+    NormallyOpenContactor contactor_precharge;
+#if USING_CONTACTOR_LOW_SIDE
+    NormallyOpenContactor contactor_low_side;
+#endif
+#if USING_CONTACTOR_INVERSOR_DISCHARGE
+    NormallyClosedContactor contactor_inversor_discharge;
+#endif
+#if USING_CONTACTOR_SUPERCAPS_CHARGE
+    NormallyOpenContactor contactor_supercaps_charge;
+#else
+    NormallyClosedContactor contactor_supercaps_discharge;
 #endif
 
-    constexpr static uint8_t UndefinedId{UINT8_MAX};
-    uint8_t PrechargeCheckId{UndefinedId};
-    uint8_t ActiveDischargeCheckId{UndefinedId};
+    constexpr static uint8_t undefined_id{UINT8_MAX};
+    constexpr static uint32_t precharge_check_period_ms{5000};
+    uint8_t precharge_check_id{undefined_id};
 
-    void close_main_circuit();
-    void close_precharge_circuit();
-    void close_active_discharge_circuit();
+    void to_normal_state();
 
-    void wait_for_precharge();
-    void cancel_precharge();
+    void to_precharge();
 
-    void wait_for_active_discharge();
-    void cancel_active_discharge();
+    void to_closed();
 
    public:
-    enum class PrechargeStatus {
-        NotStarted,
-        Ongoing,
-        Done,
-        Failed,
-    };
+    Contactors();
 
-    enum class ActiveDischargeStatus {
-        NotStarted,
-        Ongoing,
-        Done,
-        Failed,
-    };
+    void open();
 
-    static PrechargeStatus LastPrechargeStatus;
-    static ActiveDischargeStatus LastActiveDischargeStatus;
+    void close();
 
-    Contactors()
-        : ContactorHigh(Pins::ContactorHighPin),
-          ContactorPrecharge(Pins::ContactorPrechargePin),
-#if USING_CONTACTOR_LOW
-          ContactorLow(Pins::ContactorLowPin),
-#endif
-          ContactorActiveDischarge(Pins::ContactorActiveDischargePin) {
-    }
-
-    // Opens all the contactors
-    void open_all();
-
-    // Close the main circuit (High and Low), but precharges the circuit before
-    // doing so (Precharge and Low)
-    void close_with_precharge();
-
-    // Close the active discharge circuit (ActiveDischarge and Low)
-    void close_active_discharge();
+    void charge();
 };
 
 }  // namespace BCU::Actuators
