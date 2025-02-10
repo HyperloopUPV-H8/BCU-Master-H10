@@ -12,9 +12,9 @@ int main(void) {
     SharedMemory::start();
 #endif
 
-    BCU::BCU bcu = BCU::BCU();
-    BCU::Communication::FDCAN::request_all_data(EnableAutoTx | SendCellsVoltage,
-                                                1000);
+    BCU::Board bcu;
+
+    bcu.start();
 
     while (1) {
         bcu.update();
