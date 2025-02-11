@@ -41,6 +41,7 @@ void BCU::Board::update() {
     if (send_supercaps_data) {
         Communication::Ethernet::send_supercaps_data();
         send_supercaps_data = false;
+        
     }
     STLIB::update();
 }
