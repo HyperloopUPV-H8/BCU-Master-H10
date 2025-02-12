@@ -8,7 +8,13 @@
 
 bool transmit_can = false;
 int main(void) {
+#ifdef SIM_ON
+    SharedMemory::start();
+#endif
+
     BCU::Board bcu;
+
+    bcu.start();
 
     while (1) {
         bcu.update();
