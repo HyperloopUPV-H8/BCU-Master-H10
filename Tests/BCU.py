@@ -22,10 +22,12 @@ class BCU():
         
     def __init__(self):
         self.shm = SharedMemory("gpio__blinking__led","state_machine__blinking__led")
+        #TODO: create __init__
         
         
     def is_state(self,state:int):
             current_state = self.shm.get_state_machine_state(1)
+            return current_state == state
     class ContactorTest:
         def __init__(self,high:Pinout,precharge: Pinout,d_sup: Pinout):
             self.high = DigitalOutService(self.shm, high)
@@ -113,7 +115,9 @@ class BCU():
                 900:bytearray([0x03,0x84,...]),
                 901:bytearray([0x03,0x85,...])
             }
-            self.packets= Packets(packet_definition)
+            packets= Packets(packet_definition)
+            self._opencontactors_Packet= packets.serialize_packets(900)
+            self._closecontactors_Packet= packets.serialize_packets(901)
         
         def connect_gui(self):
             self.sock.connect()
@@ -121,8 +125,21 @@ class BCU():
         def disconnect_gui(self):
             self.sock.stop()
             
-        def transmit(self,packet):
-            self.sock.transmit(packet)
+        def transmit_opencontactors(self):
+            self.sock.transmit(self._opencontactors_Packet)
+            return self.sock.is_running()
+
+        def transmit_closecontactors(self):
+            self.sock.transmit(self._closecontactors_Packet)
+            return self.sock.is_running()
+        
+        def check_received_packet(self)->bool:
+            raw_data = self.sock.get_packet()
+            if raw_data is None: 
+                return False
+            return True
+            #id,value = struct.unpack("<Hi",raw_data)
+            #return id == 1 and value == i + 5
         
         def __del__(self):
             self.sock.stop()
