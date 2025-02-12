@@ -1,17 +1,21 @@
-import vmcu.assertions as assertions
-import vmcu.services.communications.FDCAN as FDCAN
-import vmcu.pin.pinout as Pinout
-import vmcu.services.digital_in as DigitalInService
-import vmcu.services.digital_out as DigitalOutService
-import vmcu.shared_memory as SharedMemory
-import vmcu.services.communications.spi as SPI
-import vmcu.services.communications.Socket as Socket
-import vmcu.services.communications.Packets as Packets
-import enum
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), "VirtualMCU", "src"))
+
+
+import src.vmcu.assertions as assertions
+import src.vmcu.services.communications.FDCAN as FDCAN
+import src.vmcu.pin.pinout as Pinout
+import src.vmcu.services.digital_in as DigitalInService
+import src.vmcu.services.digital_out as DigitalOutService
+import src.vmcu.shared_memory as SharedMemory
+import src.vmcu.services.communications.spi as SPI
+import src.vmcu.services.communications.Socket as Socket
+import src.vmcu.services.communications.Packets as Packets
+from enum import Enum
 
 class BCU():
     
-    class General_SM(enum):
+    class General_SM(Enum):
         CONNECTING = 0
         OPERATIONAL = 1
         FAULT = 2
