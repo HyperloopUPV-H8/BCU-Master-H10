@@ -125,11 +125,11 @@ class BCU():
         def disconnect_gui(self):
             self.sock.stop()
             
-        def transmit_opencontactors(self):
+        def transmit_opencontactors(self)->bool:
             self.sock.transmit(self._opencontactors_Packet)
             return self.sock.is_running()
 
-        def transmit_closecontactors(self):
+        def transmit_closecontactors(self)->bool:
             self.sock.transmit(self._closecontactors_Packet)
             return self.sock.is_running()
         
