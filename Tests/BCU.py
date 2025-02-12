@@ -138,7 +138,7 @@ class BCU():
             if raw_data is None: 
                 return False
             return True
-            #id,value = struct.unpack("<Hi",raw_data)
+            #id,value = struct.unpack("<Hi",raw_data) used in test from template_project
             #return id == 1 and value == i + 5
         
         def __del__(self):
