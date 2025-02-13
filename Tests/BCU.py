@@ -2,14 +2,14 @@ import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), "VirtualMCU", "src"))
 
 
-import src.vmcu.assertions as assertions
-import src.vmcu.services.communications.FDCAN as FDCAN
-import src.vmcu.pin.pinout as Pinout
-import src.vmcu.services.digital_out as DigitalOutService
-import src.vmcu.shared_memory as SharedMemory
-import src.vmcu.services.communications.spi as SPI
-import src.vmcu.services.communications.Socket as Socket
-import src.vmcu.services.communications.Packets as Packets
+import vmcu.assertions as assertions
+from vmcu.services.communications.FDCAN import FDCAN
+from vmcu.pin.pinout import Pinout
+from vmcu.services.digital_out import DigitalOutService
+from vmcu.shared_memory import SharedMemory
+#from vmcu.services.communications.spi import spi
+from vmcu.services.communications.Socket import Socket
+from vmcu.services.communications.Packets import Packets
 from enum import Enum
 
 class BCU():
@@ -20,9 +20,13 @@ class BCU():
         FAULT = 2
         
     def __init__(self,high:Pinout,precharge: Pinout,d_sup: Pinout):
+        print("b")
         self.shm = SharedMemory("gpio_BCU","state_machine_BCU")
+        print("c")
         self.contactor = self.ContactorTest(high,precharge,d_sup)
+        print("d")
         self.CAN = self.FDCAN_test(self.shm, Pinout.PB11, Pinout.PB10)
+        print("e")
         self.GUI = self.Ethernet_tests("localhost", 50400, "localhost", 50500)
 
         
