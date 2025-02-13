@@ -25,12 +25,6 @@ class BCU():
         self.CAN = self.FDCAN_test(self.shm, Pinout.PB11, Pinout.PB10)
         self.GUI = self.Ethernet_tests("localhost", 50400, "localhost", 50500)
 
-    def __init__(self,high:Pinout,precharge: Pinout,d_sup: Pinout):
-        self.shm = SharedMemory("gpio_BCU","state_machine_BCU")
-        self.contactor = self.ContactorTest(high,precharge,d_sup)
-        self.CAN = self.FDCAN_test(self.shm, Pinout.PB11, Pinout.PB10)
-        self.GUI = self.Ethernet_tests("localhost", 50400, "localhost", 50500)
-
         
     def is_state(self,state:int):
             current_state = self.shm.get_state_machine_state(0)
@@ -100,17 +94,13 @@ class BCU():
             self.fdcan.start(ip, port,sendport)
 
         def receive_test(self):
-        def receive_test(self):
             def PacketReceived():
                 packet = self.fdcan.read()
                 if packet != None: #TODO: packet not defined
                     return True
                 return False
-                return False
             assertions.completes(assertions.wait_until_true(PacketReceived), before=assertions.seconds(1), msg="FDCAN did not receive the expected packet")
-            
-        def send_data_supercaps(self):
-            
+                        
         def send_data_supercaps(self):
             self.receivettest()
             for i in {0,2}:
@@ -119,10 +109,8 @@ class BCU():
                     assertions.completes(assertions.wait_until_true(self.fdcan.transmit(i,self.fdcanData[i][j],FDCAN.DLC.BYTES_8)), before=assertions.seconds(1), msg="FDCAN did not transmit")
         
         def reset_supercaps(self):
-        def reset_supercaps(self):
             self.receivettest()
             for i in {0,2}:
-                assertions.completes(assertions.wait_until_true(self.fdcan.transmit(i,self.fdcanData[i][7],FDCAN.DLC.BYTES_8)), before=assertions.seconds(1), msg="FDCAN did not transmit")
                 assertions.completes(assertions.wait_until_true(self.fdcan.transmit(i,self.fdcanData[i][7],FDCAN.DLC.BYTES_8)), before=assertions.seconds(1), msg="FDCAN did not transmit")
             
     class SPI_tests:#TODO
@@ -146,11 +134,9 @@ class BCU():
             self.sock.stop()
             
         def transmit_open_contactors(self)->bool:
-        def transmit_open_contactors(self)->bool:
             self.sock.transmit(self._opencontactors_Packet)
             return self.sock.is_running()
 
-        def transmit_close_contactors(self)->bool:
         def transmit_close_contactors(self)->bool:
             self.sock.transmit(self._closecontactors_Packet)
             return self.sock.is_running()
@@ -160,21 +146,10 @@ class BCU():
                 raw_data = self.sock.get_packet()
                 if raw_data is None: 
                     return False
-        def check_packet(self)->bool: #def check_packet(self,id,value)->bool:
-            def check_received_packet():#def check_received_packet(id,value):
-                raw_data = self.sock.get_packet()
-                if raw_data is None: 
-                    return False
             #id,value = struct.unpack("<Hi",raw_data) used in test from template_project
             #return id == 1 and value == i + 5
-
                 return True
-            assertions.completes(assertions.wait_until_true(check_received_packet), before=assertions.seconds(1), msg="Packet not received")
-           
-
-                return True
-            assertions.completes(assertions.wait_until_true(check_received_packet), before=assertions.seconds(1), msg="Packet not received")
-           
+            assertions.completes(assertions.wait_until_true(check_received_packet), before=assertions.seconds(1), msg="Packet not received")           
         
         def __del__(self):
             self.sock.stop()
