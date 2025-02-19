@@ -59,8 +59,8 @@ const uint16_t FDCAN_PORT_BASE = 6969;
 const uint16_t FDCAN_PORT_SEND = 7070;
 
 FDCAN::Instance FDCAN::instance1 = {
-    .TX = PD1,
-    .RX = PD0,
+    .TX = PB10,
+    .RX = PB11,
     .dlc = DLC::BYTES_64,
     .rx_location = 0,
     .fdcan_number = 1,
