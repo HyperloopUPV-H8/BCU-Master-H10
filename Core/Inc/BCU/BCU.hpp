@@ -43,10 +43,8 @@ class Board {
         // This constructor is called twice, but since on the first call the
         // DigitalOutputService map has not yet been initialized, the old
         // entries are destroyed and we need to do this here actually
-        contactors = Actuators::Contactors();
-        leds = Actuators::LEDs();
-        instance = this;
 
+        instance = this;
         Communication::FDCAN::initialize();
         STLIB::start(IPV4("192.168.0.15"), IPV4("255.255.255.0"),
                      IPV4("192.168.0.1"), UART::uart2);
