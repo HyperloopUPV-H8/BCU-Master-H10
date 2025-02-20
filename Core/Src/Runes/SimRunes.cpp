@@ -128,7 +128,7 @@ map<Pin, ADC::Instance> ADC::available_instances = {
     {PA5, Instance(ADCResolution::ADC_RES_16BITS)},
     {PA6, Instance(ADCResolution::ADC_RES_16BITS)},
     {PB0, Instance(ADCResolution::ADC_RES_16BITS)},
-    {PB1, Instance(ADCResolution::ADC_RES_16BITS)}};
+    {PB1, Instance(ADCResolution::ADC_RES_16BITS)}}; 
 
 /************************************************
  *					   EXTI

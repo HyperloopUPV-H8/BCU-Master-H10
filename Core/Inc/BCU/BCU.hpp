@@ -26,6 +26,7 @@ class Board {
     inline static bool update_fdcan{false};
 
    public:
+    static Board* instance;
     enum GeneralStates : uint8_t {
         Idle,
         Connecting,
@@ -33,8 +34,8 @@ class Board {
         Fault,
     };
 
-    inline static Actuators::Contactors contactors{};
-    inline static Actuators::LEDs leds{};
+    Actuators::Contactors contactors{};
+    Actuators::LEDs leds{};
 
     StateMachine GeneralStateMachine;
 
@@ -44,6 +45,7 @@ class Board {
         // entries are destroyed and we need to do this here actually
         contactors = Actuators::Contactors();
         leds = Actuators::LEDs();
+        instance = this;
 
         Communication::FDCAN::initialize();
         STLIB::start(IPV4("192.168.0.15"), IPV4("255.255.255.0"),

@@ -1,5 +1,7 @@
 #include "BCU/BCU.hpp"
 
+BCU::Board* BCU::Board::instance = nullptr;
+
 void BCU::Board::initialize_state_machine() {
     GeneralStateMachine = StateMachine(GeneralStates::Idle);
     GeneralStateMachine.add_state(GeneralStates::Connecting);
