@@ -14,11 +14,14 @@ import time
 def contactors_close_test():
     #Initialize the bcu test class
     print("a")
-    bcu = BCU.BCU(Pinout.PA1, Pinout.PA2, Pinout.PA3)
-    print("hola")
+    bcu = BCU.BCU(Pinout.PE6, Pinout.PF1, Pinout.PF2)
     
     #bcu is currently in connecting state:
-    assertions.check(bcu.is_state,args=(bcu.General_SM.CONNECTING), msg="bcu is not in connecting state")
+    def funcion_prueba():
+        return bcu.is_state(BCU.BCU.General_SM.CONNECTING)
+    assertions.completes(assertions.wait_until_true(funcion_prueba), msg="bcu is not in connecting state")
+    
+    print("f")
     bcu.contactor.check_open()
     #Start recieving data from the supercaps CAN:
     #bcu.CAN.start(127.0.0.1,7070,6969)
@@ -27,14 +30,19 @@ def contactors_close_test():
     
     
     #bcu transition to operational:
+    print("g")
     bcu.GUI.connect_gui()
+    print("h")
     assertions.completes(assertions.wait_until_true(bcu.is_state),args=(bcu.General_SM.OPERATIONAL),before=(assertions.milliseconds(500)), msg="bcu is not in operational state")
+    print("i")
     bcu.contactor.check_open()
     
     #bcu operational:
     
     #Open contactors:
+    print("j")
     bcu.GUI.transmit_close_contactors()
+    print("k")
     bcu.contactor.completes_precharging(before = assertions.milliseconds(500))
     bcu.contactor.completes_close(before = assertions.seconds(5.5),after= assertions.seconds(5))
     
