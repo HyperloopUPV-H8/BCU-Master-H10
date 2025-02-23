@@ -28,7 +28,6 @@ class BCU():
         #self.CAN = self.FDCAN_test(self.shm, Pinout.PB11, Pinout.PB10)
         print("e")
         self.GUI = self.Ethernet_tests("127.0.0.1", 50401, "127.0.0.1", 50500)
-        print("1")
 
         
     def is_state(self,state:General_SM):
@@ -37,23 +36,23 @@ class BCU():
         
         
     class ContactorTest:
-        def __init__(self,high:Pinout,precharge: Pinout,d_sup: Pinout,shm):
+        def __init__(self,high:Pinout,precharge: Pinout,dischrg: Pinout,shm):
             self.shm = shm
             self.high = DigitalOutService(self.shm, high)
             self.precharge = DigitalOutService(self.shm, precharge)
-            self.d_sup = DigitalOutService(self.shm, d_sup)
+            self.dischrg = DigitalOutService(self.shm, dischrg)
         
         def check_open_contactors(self):
-            return self.high.get_pin_state() == 0 and self.precharge.get_pin_state() == 0 and self.d_sup.get_pin_state() == 0
+            return self.high.get_pin_state() == 0 and self.precharge.get_pin_state() == 0 and self.dischrg.get_pin_state() == 0
         
         def check_precharging_contactors(self):
-            return self.high.get_pin_state() == 0 and self.precharge.get_pin_state() == 1 and self.d_sup.get_pin_state() == 1
+            return self.high.get_pin_state() == 0 and self.precharge.get_pin_state() == 1 and self.dischrg.get_pin_state() == 0
         
         def check_charging_contactors(self):
-            return self.high.get_pin_state() == 0 and self.precharge.get_pin_state() == 0 and self.d_sup.get_pin_state() == 1
+            return self.high.get_pin_state() == 0 and self.precharge.get_pin_state() == 0 and self.dischrg.get_pin_state() == 1
         
         def check_close_contactors(self):
-            return self.high.get_pin_state() == 1 and self.precharge.get_pin_state() == 0 and self.d_sup.get_pin_state() == 1
+            return self.high.get_pin_state() == 1 and self.precharge.get_pin_state() == 0 and self.dischrg.get_pin_state() == 1
         
         def check_open(self):
             assertions.check(self.check_open_contactors, msg="Contactors are not closed while in open state")
