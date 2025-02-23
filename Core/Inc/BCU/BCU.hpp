@@ -46,8 +46,10 @@ class Board {
 
         instance = this;
         Communication::FDCAN::initialize();
-        STLIB::start(IPV4("192.168.0.15"), IPV4("255.255.255.0"),
-                     IPV4("192.168.0.1"), UART::uart2);
+        //STLIB::start(IPV4("192.168.0.15"), IPV4("255.255.255.0"),
+                     //IPV4("192.168.0.1"), UART::uart2);
+        STLIB::start(IPV4("127.0.0.1"), IPV4("255.255.255.0"),
+                     IPV4("127.0.0.1"), UART::uart2);
         Communication::Ethernet::initialize();
         leds.signal_can_started();
         initialize_state_machine();

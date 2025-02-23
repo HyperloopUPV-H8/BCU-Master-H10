@@ -19,15 +19,15 @@ class BCU():
         OPERATIONAL = 1
         FAULT = 2
         
-    def __init__(self,high:Pinout,precharge: Pinout,d_sup: Pinout):
+    def __init__(self):
         print("b")
         self.shm = SharedMemory("gpio_BCU","state_machine_BCU")
         print("c")
-        self.contactor = self.ContactorTest(high,precharge,d_sup,self.shm)
+        self.contactor = self.ContactorTest(Pinout.PE6, Pinout.PF1, Pinout.PF2,self.shm)
         print("d")
         #self.CAN = self.FDCAN_test(self.shm, Pinout.PB11, Pinout.PB10)
         print("e")
-        self.GUI = self.Ethernet_tests("localhost", 50500, "localhost", 50401)
+        self.GUI = self.Ethernet_tests("127.0.0.1", 50401, "127.0.0.1", 50500)
         print("1")
 
         
@@ -129,8 +129,8 @@ class BCU():
                 901:[]
             }
             packets= Packets(packet_definition)
-            self._opencontactors_Packet= packets.serialize_packet(900)
-            self._closecontactors_Packet= packets.serialize_packet(901)
+            self._opencontactors_Packet= packets.serialize_packet(901)
+            self._closecontactors_Packet= packets.serialize_packet(900)
         
         def connect_gui(self):
             self.sock.connect()
