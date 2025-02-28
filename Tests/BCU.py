@@ -25,7 +25,7 @@ class BCU():
         print("c")
         self.contactor = self.ContactorTest(Pinout.PE6, Pinout.PF1, Pinout.PF2,self.shm)
         print("d")
-        #self.CAN = self.FDCAN_test(self.shm, Pinout.PB11, Pinout.PB10)
+        self.CAN = self.FDCAN_test(self.shm, Pinout.PB11, Pinout.PB10)
         print("e")
         self.GUI = self.Ethernet_tests("127.0.0.1", 50401, "127.0.0.1", 50500)
 
