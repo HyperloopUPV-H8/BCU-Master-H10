@@ -22,7 +22,7 @@ def contactors_close_test():
     assertions.completes(assertions.wait_until_true(Check_connecting), msg="bcu is not in connecting state")
     
     print("f")
-    #bcu.contactor.check_open()  not working for now
+    bcu.contactor.completes_open(before = assertions.milliseconds(500)) 
     #Start recieving data from the supercaps CAN: Not working for now
     #bcu.CAN.start("127.0.0.1",7070,6969)
     #bcu.CAN.receive_test()
@@ -42,7 +42,7 @@ def contactors_close_test():
     print("k")
     bcu.contactor.completes_precharging(before = assertions.milliseconds(500))
     print("l")
-    #bcu.contactor.completes_close(before = assertions.seconds(5.5),after= assertions.seconds(5))
+    bcu.contactor.completes_close(before = assertions.seconds(8))
     
     #Open contactors:
     print("m")

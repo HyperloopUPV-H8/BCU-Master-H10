@@ -55,10 +55,10 @@ class BCU():
             return self.high.get_pin_state() == 1 and self.precharge.get_pin_state() == 0 and self.dischrg.get_pin_state() == 1
         
         def check_open(self):
-            assertions.check(self.check_open_contactors, msg="Contactors are not closed while in open state")
+            assertions.check(self.check_open_contactors, msg="Contactors are not opened")
         
         def completes_open(self,before: float|None=None,after:float|None=None):
-            assertions.completes(assertions.wait_until_true(self.check_open_contactors), before=before,after=after, msg="Contactors are not closed while in open state")
+            assertions.completes(assertions.wait_until_true(self.check_open_contactors), before=before,after=after, msg="Contactors are not opened")
         
         def check_precharging(self):
             assertions.check(self.check_precharging_contactors, msg="Contactors are not open while in discharging state")
@@ -67,10 +67,10 @@ class BCU():
             assertions.completes(assertions.wait_until_true(self.check_precharging_contactors), before=before,after=after, msg="Contactors are not open while in discharging state")
         
         def check_close(self):
-            assertions.check(self.check_close_contactors,msg="Contactors are not closed while in close state")
+            assertions.check(self.check_close_contactors,msg="Contactors are not closed ")
         
         def completes_close(self,before: float|None=None,after:float|None=None):
-            assertions.completes(assertions.wait_until_true(self.check_close_contactors), before=before,after=after, msg="Contactors are not closed while in close state")
+            assertions.completes(assertions.wait_until_true(self.check_close_contactors), before=before,after=after, msg="Contactors are not closed ")
         
         def check_charging(self):
             assertions.check(self.check_charging_contactors,msg="Contactors are not open while in charging state")
@@ -125,17 +125,23 @@ class BCU():
             self.sock = Socket(lip, lport, rip, rport)
             packet_definition= {
                 900:[],
-                901:[]
+                901:[],
+                902:[]
             }
             packets= Packets(packet_definition)
+            self._restart_supercaps = packets.serialize_packet(900)
             self._opencontactors_Packet= packets.serialize_packet(901)
-            self._closecontactors_Packet= packets.serialize_packet(900)
+            self._closecontactors_Packet= packets.serialize_packet(902)
         
         def connect_gui(self):
             self.sock.connect()
         
         def disconnect_gui(self):
             self.sock.stop()
+        
+        def transmit_restart(self):
+            self.sock.transmit(self._restart_supercaps)
+            return self.sock.is_running()
             
         def transmit_open_contactors(self)->bool:
             self.sock.transmit(self._opencontactors_Packet)

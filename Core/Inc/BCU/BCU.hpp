@@ -51,6 +51,7 @@ class Board {
         STLIB::start(IPV4("127.0.0.1"), IPV4("255.255.255.0"),
                      IPV4("127.0.0.1"), UART::uart2);
         Communication::Ethernet::initialize();
+        contactors.open();
         leds.signal_can_started();
         initialize_state_machine();
 
