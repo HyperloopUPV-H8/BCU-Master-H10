@@ -81,15 +81,15 @@ class BCU():
     class FDCAN_test:
         def __init__(self,shm:SharedMemory, Rx: Pinout, Tx: Pinout):
             self.fdcan = FDCAN(Rx, Tx, shm)
-            self.fdcanids ={}
-            self.fdcanData={}
-            for i in {0,2}:
-                for j in {1,4}:
+            self.fdcanids = [[0 for _ in range(8)] for _ in range(2)]
+            self.fdcanData=[[0 for _ in range(8)] for _ in range(2)]
+            for i in range(0,2):
+                for j in range(1,4):
                     self.fdcanids[i][j] =j*256+16+i
                 self.fdcanids[i][7] = 7*256+16+i
                 self.fdcanData[i][1] = bytearray([0x00, 0x01, 0x88, 0x88, 100,69,0,0])
                 self.fdcanData[i][2] = bytearray([0x88,0x88,0x69,0x69,0x78,0x78,0x0F,0x0A])
-                self.fdcanData[i][3] = bytearray([None,None,0,0,0,0,0,0])
+                self.fdcanData[i][3] = bytearray([0,0,0,0,0,0,0,0]) #2 first values should be None but it doesnt work :()
                 self.fdcanData[i][4] = bytearray([0,1,0x88,0x88,0x69,0x69,0x78,0x78])                
                 self.fdcanData[i][7] = bytearray([0,0,0,0,0,0,0,0])
             
@@ -106,15 +106,15 @@ class BCU():
             assertions.completes(assertions.wait_until_true(PacketReceived), before=assertions.seconds(1), msg="FDCAN did not receive the expected packet")
                         
         def send_data_supercaps(self):
-            self.receivettest()
-            for i in {0,2}:
-                for j in {1,4}:
+            self.receive_test()
+            for i in range(0,2):
+                for j in range(1,4):
                     assertions.completes(assertions.wait_until_true(self.fdcan.transmit(i,self.fdcanData[i][j],FDCAN.DLC.BYTES_8)), before=assertions.seconds(1), msg="FDCAN did not transmit")
                     assertions.completes(assertions.wait_until_true(self.fdcan.transmit(i,self.fdcanData[i][j],FDCAN.DLC.BYTES_8)), before=assertions.seconds(1), msg="FDCAN did not transmit")
         
         def reset_supercaps(self):
             self.receivettest()
-            for i in {0,2}:
+            for i in range(0,2):
                 assertions.completes(assertions.wait_until_true(self.fdcan.transmit(i,self.fdcanData[i][7],FDCAN.DLC.BYTES_8)), before=assertions.seconds(1), msg="FDCAN did not transmit")
             
     class SPI_tests:#TODO

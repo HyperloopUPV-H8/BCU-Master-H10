@@ -12,11 +12,11 @@ class Ethernet {
      * Socket Definition *
      *********************/
 
-    //inline const static IPV4 LocalIP{"192.168.0.15"};
-    //inline const static IPV4 BackendIP{"192.168.0.9"};
+    inline const static IPV4 LocalIP{"192.168.0.15"};
+    inline const static IPV4 BackendIP{"192.168.0.9"};
 
-    inline const static IPV4 LocalIP{"127.0.0.1"};
-    inline const static IPV4 BackendIP{"127.0.0.1"};
+    /*inline const static IPV4 LocalIP{"127.0.0.1"};
+    inline const static IPV4 BackendIP{"127.0.0.1"}; Test use */
 
     inline const static uint32_t TCPServerPort{50500};
     inline const static uint32_t TCPClientPort{50401};
