@@ -46,7 +46,7 @@
 namespace BCU::Pinout {
 
 Pin& uart_tx_pin{UART_TX_M_RX_S};
-Pin& uart_rx_pin{UART_RX_M_TX_S}
+Pin& uart_rx_pin{UART_RX_M_TX_S};
 
 Pin& spi_chip_select_pin{SPI_CS};
 Pin& spi_mosi_pin{SPI_MOSI};
@@ -57,11 +57,11 @@ Pin& can_tx_pin{M_TXD};
 Pin& can_rx_pin{M_RXD};
 Pin& can_silent_mode_pin{SLNT_Master};
 
-Pin& led_operational_pin{LED_OPERATIONAL};
-Pin& led_fault_pin{LED_FAULT};
-Pin& led_can_pin{LED_CAN};
-Pin& led_flash_pin{LED_FLASH};
-Pin& led_sleep_pin{LED_SLEEP};
+Pin& led_operational_pin{LED_OPERATIONAL_M};
+Pin& led_fault_pin{LED_FAULT_M};
+Pin& led_can_pin{LED_CAN_M};
+Pin& led_flash_pin{LED_FLASH_M};
+Pin& led_sleep_pin{LED_SLEEP_M};
 
 Pin& buffer_enable_1_pin{ENABLE_BUFFER_M_1};
 Pin& buffer_enable_2_pin{ENABLE_BUFFER_M_2};
