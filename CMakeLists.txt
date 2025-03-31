@@ -27,8 +27,6 @@ endif()
 
 set(STLIB_NAME_SUFFIX master)
 add_subdirectory(${STLIB_DIR})
-set(CMSLIB_NAME_SUFFIX master)
-add_subdirectory(${CMSLIB_DIR})
 
 set(HAL_HEADER 
   ${CMAKE_CURRENT_LIST_DIR}/Core/Inc/main.h
@@ -73,7 +71,6 @@ ${SOURCE_CPP}
 
 target_link_libraries(${EXECUTABLE} PRIVATE 
   ${STLIB_LIBRARY}
-  ${CMSLIB_LIBRARY}
 )
 
 set_target_properties(${EXECUTABLE} PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED C_STANDARD 11 C_STANDARD_REQUIRED)
@@ -140,9 +137,6 @@ target_include_directories(${EXECUTABLE} PRIVATE
   ${STLIB_DIR}/Inc
   ${STLIB_DIR}/Inc/ST-LIB_LOW
   ${STLIB_DIR}/Inc/ST-LIB_HIGH
-  ${CMSLIB_DIR}/Inc
-  ${CMSLIB_DIR}/Inc/Models
-  ${CMSLIB_DIR}/Inc/C++Utilities
 )
 
 target_link_options(${EXECUTABLE} PRIVATE 
