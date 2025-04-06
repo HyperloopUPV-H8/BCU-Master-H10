@@ -170,5 +170,5 @@ add_custom_command(
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E create_symlink
   ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE}
-  ${CMAKE_SOURCE_DIR}/out/build/latest.elf
+  ${CMAKE_SOURCE_DIR}/out/${EXECUTABLE}
 )

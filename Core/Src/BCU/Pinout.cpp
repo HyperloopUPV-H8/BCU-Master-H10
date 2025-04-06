@@ -52,6 +52,7 @@ Pin& spi_chip_select_pin{SPI_CS};
 Pin& spi_mosi_pin{SPI_MOSI};
 Pin& spi_miso_pin{SPI_MISO};
 Pin& spi_clock_pin{SPI_CLK};
+Pin& spi_ready_slave_pin{GPIO1};
 
 Pin& can_tx_pin{M_TXD};
 Pin& can_rx_pin{M_RXD};
@@ -63,9 +64,9 @@ Pin& led_can_pin{LED_CAN_M};
 Pin& led_flash_pin{LED_FLASH_M};
 Pin& led_sleep_pin{LED_SLEEP_M};
 
-Pin& buffer_enable_1_pin{ENABLE_BUFFER_M_1};
-Pin& buffer_enable_2_pin{ENABLE_BUFFER_M_2};
-Pin& buffer_enable_3_pin{ENABLE_BUFFER_M_3};
+Pin& buffer_1_enable__pin{ENABLE_BUFFER_M_1};
+Pin& buffer_2_enable_pin{ENABLE_BUFFER_M_2};
+Pin& buffer_3_enable_pin{ENABLE_BUFFER_M_3};
 
 Pin& inverter_1_temp_pin{TEMP1};
 Pin& inverter_2_temp_pin{TEMP2};

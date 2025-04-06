@@ -1,29 +1,33 @@
 #pragma once
 
 #include "ST-LIB.hpp"
+#include "Shared/SPI.hpp"
+#include "Shared/StateMachine.hpp"
 
 namespace BCU::Communication {
 
 class SPI {
+   public:
+    StateMachine::state_id slave_general_state{
+        Shared::State::SharedStateMachine::GeneralState::Connecting};
+    StateMachine::state_id slave_nested_state{
+        Shared::State::SharedStateMachine::NestedState::Idle};
+
+   private:
     uint8_t spi_id;
 
     StateMachine::state_id *master_general_state;
     StateMachine::state_id *master_nested_state;
 
-    SPIPacket<2, StateMachine::state_id, StateMachine::state_id>
-        slave_state_packet{&slave_general_state, &slave_nested_state};
-    SPIPacket<2, StateMachine::state_id, StateMachine::state_id>
-        master_state_packet{master_general_state, master_nested_state};
-    SPIStackOrder state_order{1, slave_state_packet, master_state_packet};
+    SPIStackOrder *state_order;
 
    public:
-    StateMachine::state_id slave_general_state;
-    StateMachine::state_id slave_nested_state;
+    SPI();
 
-    SPI(StateMachine::state_id *master_general_state,
-        StateMachine::state_id *master_nested_state);
+    SPI(Pin &spi_ready_slave_pin);
 
-    void start();
+    void start(StateMachine::state_id *master_general_state,
+               StateMachine::state_id *master_nested_state);
 
     void update();
 

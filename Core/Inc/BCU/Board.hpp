@@ -1,10 +1,29 @@
 #pragma once
 
+#include "BCU/Actuators/LEDs.hpp"
 #include "BCU/Communication/Ethernet.hpp"
 #include "BCU/Communication/SPI.hpp"
+#include "BCU/Pinout.hpp"
 #include "ST-LIB.hpp"
+#include "Shared/StateMachine.hpp"
 
 namespace BCU {
+
+// Turn the ProtectionManager into a class
+struct ProtectionManagerHandle {
+    ProtectionManagerHandle(StateMachine& state_machine) {
+        ProtectionManager::initialize();
+        ProtectionManager::add_standard_protections();
+        ProtectionManager::link_state_machine(
+            state_machine,
+            Shared::State::SharedStateMachine::GeneralState::Fault);
+    }
+
+    void update_low_frequency() { ProtectionManager::check_protections(); }
+    void update_high_frequency() {
+        ProtectionManager::check_high_frequency_protections();
+    }
+};
 
 // Turn the STLIB into a class
 struct STLIBHandle {
@@ -18,24 +37,19 @@ struct STLIBHandle {
 };
 
 class Board {
-   public:
-    enum GeneralState : uint8_t { Connecting = 0, Operational = 1, Fault = 2 };
-    enum OperationalState : uint8_t { Idle = 0, Ready = 1, Boosting = 2 };
-
-   private:
-    bool enable_booster{false};
-    bool dc_poles_ready{false};
-
-    StateMachine general_state_machine{GeneralState::Connecting};
-    StateMachine operational_state_machine{OperationalState::Idle};
+    Shared::State::SharedStateMachine state_machine{};
+    ProtectionManagerHandle protection_manager{
+        state_machine.general_state_machine};
 
     Communication::SPI spi;
+
+    Actuators::LEDs leds;
 
     STLIBHandle stlib;
 
     Communication::Ethernet ethernet;
 
-    void initialize_state_machine();
+    void populate_state_machine();
 
     void update_connecting();
     void update_operational();

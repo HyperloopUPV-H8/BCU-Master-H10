@@ -17,10 +17,6 @@ void Ethernet::send_board_state() {
     control_station_udp.send_packet(board_state);
 }
 
-void Ethernet::send_request_dc_poles() {
-    control_station_tcp.send_order(request_dc_poles);
-}
-
 bool Ethernet::is_connected() { return control_station_tcp.is_connected(); }
 
 };  // namespace BCU::Communication
