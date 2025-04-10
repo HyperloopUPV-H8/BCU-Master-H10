@@ -5,7 +5,9 @@ namespace BCU {
 using namespace Shared::State;
 
 Board::Board()
-    : spi(Pinout::spi_ready_slave_pin),
+    : spi(Pinout::spi_ready_slave_pin,
+          &state_machine.general_state_machine.current_state,
+          &state_machine.nested_state_machine.current_state),
       leds(Pinout::led_operational_pin, Pinout::led_fault_pin,
            Pinout::led_can_pin, Pinout::led_flash_pin, Pinout::led_sleep_pin),
       stlib(BCU::Communication::Ethernet::local_ip.string_address),
@@ -14,8 +16,7 @@ Board::Board()
                &spi.slave_general_state, &spi.slave_nested_state) {
     populate_state_machine();
 
-    spi.start(&state_machine.general_state_machine.current_state,
-              &state_machine.nested_state_machine.current_state);
+    spi.start();
 
     Time::register_low_precision_alarm(100, [&]() {
         spi.transmit_state();

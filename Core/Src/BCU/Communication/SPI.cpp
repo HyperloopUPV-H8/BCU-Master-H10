@@ -2,28 +2,83 @@
 
 namespace BCU::Communication {
 
-SPI::SPI() : spi_id(::SPI::inscribe(::SPI::spi3)), state_order(nullptr) {}
+SPI::SPI(StateMachine::state_id *master_general_state,
+         StateMachine::state_id *master_nested_state)
+    : spi_id(::SPI::inscribe(::SPI::spi3)),
+      state_order(Shared::Communication::create_state_order(
+          master_general_state, master_nested_state, &slave_general_state,
+          &slave_nested_state)),
+      control_parameters_order(
+          Shared::Communication::create_control_parameters_order(
+              &velocity_reference, &velocity_error, &u_current_measurement,
+              &v_current_measurement, &w_current_measurement, &electrical_angle,
+              &d_current_reference, &d_current_measurement, &d_current_error,
+              &q_current_reference, &q_current_measurement, &q_current_error,
+              &three_phase_unbalance, &d_target_voltage, &q_target_voltage,
+              &u_target_voltage, &v_target_voltage, &w_target_voltage,
+              &u_output_voltage, &v_output_voltage, &w_output_voltage,
+              &u_duty_cycle, &v_duty_cycle, &w_duty_cycle, &angular_velocity)),
+      start_velocity_control_order(
+          Shared::Communication::create_start_velocity_control_order(
+              &requested_velocity_reference)),
+      start_current_control_order(
+          Shared::Communication::create_start_current_control_order(
+              &requested_d_current_reference, &requested_q_current_reference)),
+      start_emulated_movement_order(
+          Shared::Communication::create_start_emulated_movement_order(
+              &requested_d_current_reference, &requested_q_current_reference,
+              &requested_angular_velocity)),
+      start_test_pwm_order(Shared::Communication::create_start_test_pwm_order(
+          &requested_duty_cycle_u, &requested_duty_cycle_v,
+          &requested_duty_cycle_w)),
+      stop_control_order(Shared::Communication::create_stop_control_order()),
+      enable_booster_order(
+          Shared::Communication::create_enable_booster_order()),
+      encoder_order(Shared::Communication::create_position_encoder_order(
+          {&position[0], &position[1], &position[2]},
+          {&velocity[0], &velocity[1], &velocity[2]},
+          {&acceleration[0], &acceleration[1], &acceleration[2]},
+          {&direction[0], &direction[1], &direction[2]}, &average_position,
+          &max_velocity, &is_detecting)),
+      force_dc_link_order(Shared::Communication::create_force_dc_link_order(
+          &requested_dc_link_voltage)),
+      unlock_dc_link_order(
+          Shared::Communication::create_unlock_dc_link_order()),
+      commutation_settings_order(
+          Shared::Communication::create_commutation_settings_order(
+              &requested_commutation_frequency_hz,
+              &requested_commutation_dead_time_ns)),
+      motor_driver_order(Shared::Communication::create_motor_driver_order(
+          {&dc_link_voltage[0], &dc_link_voltage[1], &dc_link_voltage[2],
+           &dc_link_voltage[3]},
+          {std::array<float *, 3>{&motor_phase_current[0][0],
+                                  &motor_phase_current[0][1],
+                                  &motor_phase_current[0][2]},
+           std::array<float *, 3>{&motor_phase_current[1][0],
+                                  &motor_phase_current[1][1],
+                                  &motor_phase_current[1][2]},
+           std::array<float *, 3>{&motor_phase_current[2][0],
+                                  &motor_phase_current[2][1],
+                                  &motor_phase_current[2][2]},
+           std::array<float *, 3>{&motor_phase_current[3][0],
+                                  &motor_phase_current[3][1],
+                                  &motor_phase_current[3][2]}},
+          {&gate_driver_fault[0], &gate_driver_fault[1], &gate_driver_fault[2],
+           &gate_driver_fault[3]},
+          {&gate_driver_ready[0], &gate_driver_ready[1], &gate_driver_ready[2],
+           &gate_driver_ready[3]})) {}
 
-SPI::SPI(Pin &spi_ready_slave_pin) : SPI() {
+SPI::SPI(Pin &spi_ready_slave_pin, StateMachine::state_id *master_general_state,
+         StateMachine::state_id *master_nested_state)
+    : SPI(master_general_state, master_nested_state) {
     ::SPI::assign_RS(spi_id, spi_ready_slave_pin);
 }
 
-static void state_callback() {}
-
-void SPI::start(StateMachine::state_id *master_general_state,
-                StateMachine::state_id *master_nested_state) {
-    state_order = Shared::Communication::create_state_order(
-        master_general_state, master_nested_state, &slave_general_state,
-        &slave_nested_state);
-    state_order->set_callback(state_callback);
-}
+void SPI::start() {}
 
 void SPI::update() { ::SPI::Order_update(); }
 
 void SPI::transmit_state() {
-    if (state_order == nullptr) {
-        return;
-    }
     ::SPI::master_transmit_Order(spi_id, state_order);
 }
 
