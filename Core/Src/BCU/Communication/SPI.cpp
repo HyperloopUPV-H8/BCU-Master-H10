@@ -82,4 +82,50 @@ void SPI::transmit_state() {
     ::SPI::master_transmit_Order(spi_id, state_order);
 }
 
+void SPI::enable_booster() {
+    ::SPI::master_transmit_Order(spi_id, enable_booster_order);
+}
+
+void SPI::start_velocity_control(double velocity_reference) {
+    requested_velocity_reference = velocity_reference;
+    ::SPI::master_transmit_Order(spi_id, start_velocity_control_order);
+}
+
+void SPI::start_current_control(double d_current_reference,
+                                double q_current_reference) {
+    requested_d_current_reference = d_current_reference;
+    requested_q_current_reference = q_current_reference;
+    ::SPI::master_transmit_Order(spi_id, start_current_control_order);
+}
+
+void SPI::start_emulated_movement(double d_current_reference,
+                                  double q_current_reference,
+                                  double angular_velocity) {
+    requested_d_current_reference = d_current_reference;
+    requested_q_current_reference = q_current_reference;
+    requested_angular_velocity = angular_velocity;
+    ::SPI::master_transmit_Order(spi_id, start_emulated_movement_order);
+}
+
+void SPI::start_test_pwm(double duty_cycle_u, double duty_cycle_v,
+                         double duty_cycle_w) {
+    requested_duty_cycle_u = duty_cycle_u;
+    requested_duty_cycle_v = duty_cycle_v;
+    requested_duty_cycle_w = duty_cycle_w;
+    ::SPI::master_transmit_Order(spi_id, start_test_pwm_order);
+}
+
+void SPI::stop_control() {
+    ::SPI::master_transmit_Order(spi_id, stop_control_order);
+}
+
+void SPI::force_dc_link(float dc_link_voltage) {
+    requested_dc_link_voltage = dc_link_voltage;
+    ::SPI::master_transmit_Order(spi_id, force_dc_link_order);
+}
+
+void SPI::unlock_dc_link() {
+    ::SPI::master_transmit_Order(spi_id, unlock_dc_link_order);
+}
+
 };  // namespace BCU::Communication

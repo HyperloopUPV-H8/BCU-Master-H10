@@ -107,7 +107,29 @@ class SPI {
     void update();
 
     void transmit_state();
-};
-;
 
-}  // namespace BCU::Communication
+    void enable_booster();
+
+    void start_velocity_control(double velocity_reference);
+    void start_current_control(double d_current_reference,
+                               double q_current_reference);
+    void start_emulated_movement(double d_current_reference,
+                                 double q_current_reference,
+                                 double angular_velocity);
+    void start_test_pwm(double duty_cycle_u, double duty_cycle_v,
+                        double duty_cycle_w);
+
+    void stop_control();
+
+    void force_dc_link(float dc_link_voltage);
+    void unlock_dc_link();
+
+    void change_commutation_settings(uint32_t frequency_hz,
+                                     uint32_t dead_time_ns);
+
+    void read_motor_drivers();
+    void read_position_encoder();
+    void read_control_parameters();
+};
+
+};  // namespace BCU::Communication
