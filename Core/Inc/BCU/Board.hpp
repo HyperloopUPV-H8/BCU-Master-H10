@@ -2,7 +2,6 @@
 
 #include "BCU/Actuators/LEDs.hpp"
 #include "BCU/Communication/CAN.hpp"
-#include "BCU/Communication/Ethernet.hpp"
 #include "BCU/Communication/SPI.hpp"
 #include "BCU/Pinout.hpp"
 #include "ST-LIB.hpp"
