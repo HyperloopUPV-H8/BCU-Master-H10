@@ -128,4 +128,16 @@ void SPI::unlock_dc_link() {
     ::SPI::master_transmit_Order(spi_id, unlock_dc_link_order);
 }
 
+void SPI::read_motor_drivers() {
+    ::SPI::master_transmit_Order(spi_id, motor_driver_order);
+}
+
+void SPI::read_control_parameters() {
+    ::SPI::master_transmit_Order(spi_id, control_parameters_order);
+}
+
+void SPI::read_position_encoder() {
+    ::SPI::master_transmit_Order(spi_id, encoder_order);
+}
+
 };  // namespace BCU::Communication
