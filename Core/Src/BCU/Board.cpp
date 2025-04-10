@@ -10,16 +10,12 @@ Board::Board()
           &state_machine.nested_state_machine.current_state),
       leds(Pinout::led_operational_pin, Pinout::led_fault_pin,
            Pinout::led_can_pin, Pinout::led_flash_pin, Pinout::led_sleep_pin),
-      stlib(BCU::Communication::Ethernet::local_ip.string_address),
-      ethernet(&state_machine.general_state_machine.current_state,
-               &state_machine.nested_state_machine.current_state,
-               &spi.slave_general_state, &spi.slave_nested_state) {
+      can(spi),
+      stlib(BCU::Communication::Ethernet::local_ip.string_address) {
     populate_state_machine();
 
     spi.start();
-
-    Time::register_low_precision_alarm(100,
-                                       [&]() { ethernet.send_board_state(); });
+    can.start();
 
     Time::register_low_precision_alarm(10, [&]() {
         spi.transmit_state();
@@ -35,8 +31,7 @@ Board::Board()
 void Board::populate_state_machine() {
     state_machine.general_state_machine.add_transition(
         SharedStateMachine::GeneralState::Connecting,
-        SharedStateMachine::GeneralState::Operational,
-        [&]() { return ethernet.is_connected(); });
+        SharedStateMachine::GeneralState::Operational, [&]() { return true; });
 
     state_machine.general_state_machine.add_transition(
         SharedStateMachine::GeneralState::Connecting,
@@ -94,12 +89,17 @@ void Board::update_operational() {
         case SharedStateMachine::NestedState::Boosting:
             update_operational_boosting();
             break;
+        case SharedStateMachine::NestedState::Testing:
+            update_operational_testing();
+            break;
     }
+    can.update();
 }
 void Board::update_fault() {}
 
 void Board::update_operational_idle() {}
 void Board::update_operational_ready() {}
 void Board::update_operational_boosting() {}
+void Board::update_operational_testing() {}
 
 };  // namespace BCU

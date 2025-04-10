@@ -128,6 +128,13 @@ void SPI::unlock_dc_link() {
     ::SPI::master_transmit_Order(spi_id, unlock_dc_link_order);
 }
 
+void SPI::change_commutation_settings(uint32_t frequency_hz,
+                                      uint32_t dead_time_ns) {
+    requested_commutation_frequency_hz = frequency_hz;
+    requested_commutation_dead_time_ns = dead_time_ns;
+    ::SPI::master_transmit_Order(spi_id, commutation_settings_order);
+}
+
 void SPI::read_motor_drivers() {
     ::SPI::master_transmit_Order(spi_id, motor_driver_order);
 }

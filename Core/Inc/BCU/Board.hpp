@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BCU/Actuators/LEDs.hpp"
+#include "BCU/Communication/CAN.hpp"
 #include "BCU/Communication/Ethernet.hpp"
 #include "BCU/Communication/SPI.hpp"
 #include "BCU/Pinout.hpp"
@@ -45,9 +46,9 @@ class Board {
 
     Actuators::LEDs leds;
 
-    STLIBHandle stlib;
+    Communication::CAN can;
 
-    Communication::Ethernet ethernet;
+    STLIBHandle stlib;
 
     void populate_state_machine();
 
@@ -58,6 +59,7 @@ class Board {
     void update_operational_idle();
     void update_operational_ready();
     void update_operational_boosting();
+    void update_operational_testing();
 
    public:
     Board();
