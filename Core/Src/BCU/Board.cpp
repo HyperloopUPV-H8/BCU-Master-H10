@@ -18,9 +18,14 @@ Board::Board()
 
     spi.start();
 
-    Time::register_low_precision_alarm(100, [&]() {
+    Time::register_low_precision_alarm(100,
+                                       [&]() { ethernet.send_board_state(); });
+
+    Time::register_low_precision_alarm(10, [&]() {
         spi.transmit_state();
-        ethernet.send_board_state();
+        spi.read_control_parameters();
+        spi.read_motor_drivers();
+        spi.read_position_encoder();
     });
 
     Time::register_low_precision_alarm(
