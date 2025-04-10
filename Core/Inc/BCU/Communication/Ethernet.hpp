@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ST-LIB.hpp"
+#include "Shared/SPI.hpp"
 
 namespace BCU::Communication {
 
@@ -14,7 +15,7 @@ class Ethernet {
     double requested_duty_cycle_v{0.0};
     double requested_duty_cycle_w{0.0};
     float requested_dc_link_voltage{0.0f};
-    uint32_t requested_commutation_frequency_hz{0.0f};
+    uint32_t requested_commutation_frequency_hz{0};
     uint32_t requested_commutation_dead_time_ns{0};
 
     static bool has_requested_start_velocity_control;
