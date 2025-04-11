@@ -13,6 +13,8 @@ class CAN {
     float requested_d_current_reference{0.0f};
     float requested_q_current_reference{0.0f};
     float requested_angular_velocity{0.0f};
+    float requested_commutation_frequency_hz{0.0f};
+    float requested_dead_time_ns{0.0f};
 
     bool has_received_start_test_pwm{false};
     bool has_received_start_emulated_movement{false};

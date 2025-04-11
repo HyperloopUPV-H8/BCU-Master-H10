@@ -32,6 +32,10 @@ void CAN::update() {
                 has_received_start_velocity_control = true;
                 break;
             case change_commutation_settings_id:
+                memcpy(&requested_commutation_frequency_hz,
+                       last_read.rx_data.data(), sizeof(float));
+                memcpy(&requested_dead_time_ns, last_read.rx_data.data() + 4,
+                       sizeof(float));
                 has_received_change_commutation_settings = true;
                 break;
             case force_dc_link_id:

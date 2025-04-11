@@ -166,6 +166,14 @@ void Board::update() {
 
 void Board::update_connecting() {}
 void Board::update_operational() {
+    if (can.has_received_change_commutation_settings) {
+        spi.change_commutation_settings(
+            (uint32_t)can.requested_commutation_frequency_hz,
+            (uint32_t)can.requested_dead_time_ns);
+
+        can.has_received_change_commutation_settings = false;
+    }
+
     switch (state_machine.nested_state_machine.current_state) {
         case SharedStateMachine::NestedState::Idle:
             update_operational_idle();
