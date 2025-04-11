@@ -17,7 +17,7 @@ Board::Board()
     spi.start();
     can.start();
 
-    Time::register_low_precision_alarm(10, [&]() {
+    Time::register_low_precision_alarm(100, [&]() {
         spi.transmit_state();
         spi.read_control_parameters();
         spi.read_motor_drivers();
@@ -73,6 +73,7 @@ void Board::update() {
             break;
     }
 
+    can.update();
     spi.update();
     stlib.update();
 }
@@ -93,7 +94,6 @@ void Board::update_operational() {
             update_operational_testing();
             break;
     }
-    can.update();
 }
 void Board::update_fault() {}
 
