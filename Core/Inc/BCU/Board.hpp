@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BCU/Actuators/LEDs.hpp"
+#include "BCU/Actuators/MotorDriver.hpp"
 #include "BCU/Communication/CAN.hpp"
 #include "BCU/Communication/SPI.hpp"
 #include "BCU/Pinout.hpp"
@@ -44,6 +45,7 @@ class Board {
     Communication::SPI spi;
 
     Actuators::LEDs leds;
+    Actuators::MotorDriver motor_driver;
 
     Communication::CAN can;
 

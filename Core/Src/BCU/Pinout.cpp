@@ -64,7 +64,7 @@ Pin& led_can_pin{LED_CAN_M};
 Pin& led_flash_pin{LED_FLASH_M};
 Pin& led_sleep_pin{LED_SLEEP_M};
 
-Pin& buffer_1_enable__pin{ENABLE_BUFFER_M_1};
+Pin& buffer_1_enable_pin{ENABLE_BUFFER_M_1};
 Pin& buffer_2_enable_pin{ENABLE_BUFFER_M_2};
 Pin& buffer_3_enable_pin{ENABLE_BUFFER_M_3};
 
