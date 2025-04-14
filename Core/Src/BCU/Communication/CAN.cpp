@@ -14,41 +14,78 @@ void CAN::update() {
     if (FDCAN::read(can_id, &last_read)) {
         switch (last_read.identifier) {
             case start_test_pwm_id:
+                memcpy(&requested_duty_cycle_u, last_read.rx_data.data(),
+                       sizeof(requested_duty_cycle_u));
+                memcpy(
+                    &requested_duty_cycle_v,
+                    last_read.rx_data.data() + sizeof(requested_duty_cycle_u),
+                    sizeof(requested_duty_cycle_v));
+                memcpy(&requested_duty_cycle_w,
+                       last_read.rx_data.data() +
+                           sizeof(requested_duty_cycle_u) +
+                           sizeof(requested_duty_cycle_v),
+                       sizeof(requested_duty_cycle_w));
                 has_received_start_test_pwm = true;
-                requested_duty_cycle_u = (float)last_read.rx_data[0];
-                requested_duty_cycle_v = (float)last_read.rx_data[1];
-                requested_duty_cycle_w = (float)last_read.rx_data[2];
                 break;
-            case start_emulated_movement_id:
-                has_received_start_emulated_movement = true;
-                requested_d_current_reference = (float)last_read.rx_data[0];
-                requested_q_current_reference = (float)last_read.rx_data[1];
-                requested_angular_velocity = (float)last_read.rx_data[2];
-                break;
-            case start_current_control_id:
-                has_received_start_current_control = true;
-                break;
-            case start_velocity_control_id:
-                has_received_start_velocity_control = true;
-                break;
-            case change_commutation_settings_id:
+            case configure_commutation_parameters_id:
                 memcpy(&requested_commutation_frequency_hz,
-                       last_read.rx_data.data(), sizeof(float));
-                memcpy(&requested_dead_time_ns, last_read.rx_data.data() + 4,
-                       sizeof(float));
-                has_received_change_commutation_settings = true;
-                break;
-            case force_dc_link_id:
-                has_received_force_dc_link = true;
-                break;
-            case unlock_dc_link_id:
-                has_received_unlock_dc_link = true;
+                       last_read.rx_data.data(),
+                       sizeof(requested_commutation_frequency_hz));
+                memcpy(&requested_dead_time_ns,
+                       last_read.rx_data.data() +
+                           sizeof(requested_commutation_frequency_hz),
+                       sizeof(requested_dead_time_ns));
+                has_received_configure_commutation_parameters = true;
                 break;
             case stop_control_id:
                 has_received_stop_control = true;
                 break;
+            case start_space_vector_id:
+                memcpy(&requested_modulation_index, last_read.rx_data.data(),
+                       sizeof(requested_modulation_index));
+                memcpy(&requested_modulation_frequency_hz,
+                       last_read.rx_data.data() +
+                           sizeof(requested_modulation_index),
+                       sizeof(requested_modulation_frequency_hz));
+                has_received_start_space_vector = true;
+                break;
         }
     }
+}
+
+void CAN::transmit_state(StateMachine::state_id master_general_state,
+                         StateMachine::state_id master_nested_state,
+                         StateMachine::state_id slave_general_state,
+                         StateMachine::state_id slave_nested_state) {
+    std::array<uint8_t, 4 * sizeof(StateMachine::state_id)> buffer;
+    memcpy(buffer.data(), &master_general_state, sizeof(master_general_state));
+    memcpy(buffer.data() + sizeof(master_general_state), &master_nested_state,
+           sizeof(master_nested_state));
+    memcpy(buffer.data() + 2 * sizeof(master_general_state),
+           &slave_general_state, sizeof(slave_general_state));
+    memcpy(buffer.data() + 3 * sizeof(master_general_state),
+           &slave_nested_state, sizeof(slave_nested_state));
+    FDCAN::transmit(can_id, state_id,
+                    reinterpret_cast<const char *>(buffer.data()),
+                    FDCAN::DLC::BYTES_4);
+}
+
+void CAN::transmit_control_parameters(float duty_cycle_u, float duty_cycle_v,
+                                      float duty_cycle_w) {
+    uint16_t encoded_duty_cycle_u{(uint16_t)(duty_cycle_u * 100.0f)};
+    uint16_t encoded_duty_cycle_v{(uint16_t)(duty_cycle_v * 100.0f)};
+    uint16_t encoded_duty_cycle_w{(uint16_t)(duty_cycle_w * 100.0f)};
+
+    std::array<uint8_t, 3 * sizeof(uint16_t)> buffer;
+    memcpy(buffer.data(), &encoded_duty_cycle_u, sizeof(encoded_duty_cycle_u));
+    memcpy(buffer.data() + sizeof(encoded_duty_cycle_u), &encoded_duty_cycle_v,
+           sizeof(encoded_duty_cycle_v));
+    memcpy(buffer.data() + 2 * sizeof(encoded_duty_cycle_u),
+           &encoded_duty_cycle_w, sizeof(encoded_duty_cycle_w));
+
+    FDCAN::transmit(can_id, control_parameters_id,
+                    reinterpret_cast<const char *>(buffer.data()),
+                    FDCAN::DLC::BYTES_6);
 }
 
 }  // namespace BCU::Communication

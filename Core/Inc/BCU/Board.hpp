@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BCU/Actuators/LEDs.hpp"
 #include "BCU/Actuators/MotorDriver.hpp"
 #include "BCU/Communication/CAN.hpp"
 #include "BCU/Communication/SPI.hpp"
@@ -10,7 +9,6 @@
 
 namespace BCU {
 
-// Turn the ProtectionManager into a class
 struct ProtectionManagerHandle {
     ProtectionManagerHandle(StateMachine& state_machine) {
         ProtectionManager::initialize();
@@ -26,7 +24,6 @@ struct ProtectionManagerHandle {
     }
 };
 
-// Turn the STLIB into a class
 struct STLIBHandle {
     STLIBHandle(string ip = "192.168.1.4", string subnet_mask = "255.255.0.0",
                 string gateway = "192.168.1.1",
@@ -42,11 +39,9 @@ class Board {
     ProtectionManagerHandle protection_manager{
         state_machine.general_state_machine};
 
-    Communication::SPI spi;
-
-    Actuators::LEDs leds;
     Actuators::MotorDriver motor_driver;
 
+    Communication::SPI spi;
     Communication::CAN can;
 
     STLIBHandle stlib;
