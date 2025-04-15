@@ -13,9 +13,15 @@ class SPI {
     StateMachine::state_id slave_nested_state{
         Shared::State::SharedStateMachine::NestedState::Idle};
 
-    float duty_cycle_u{0.0};
-    float duty_cycle_v{0.0};
-    float duty_cycle_w{0.0};
+    float duty_cycle_u{0.0f};
+    float duty_cycle_v{0.0f};
+    float duty_cycle_w{0.0f};
+
+    float average_dc_link_voltage{0.0f};
+    float dc_link_voltage_1{0.0f};
+    float dc_link_voltage_2{0.0f};
+    float dc_link_voltage_3{0.0f};
+    float dc_link_voltage_4{0.0f};
 
    private:
     float requested_duty_cycle_u{0.0};
@@ -27,6 +33,8 @@ class SPI {
 
     float requested_modulation_index{0.0};
     float requested_modulation_frequency_hz{0.0};
+
+    float requested_dc_link_voltage{0.0};
 
     uint8_t spi_id{0};
 
@@ -41,6 +49,10 @@ class SPI {
 
     SPIStackOrder *start_space_vector_order;
 
+    SPIStackOrder *fix_dc_link_voltage_order;
+    SPIStackOrder *unfix_dc_link_voltage_order;
+    SPIStackOrder *dc_link_order;
+
    public:
     SPI(StateMachine::state_id *master_general_state,
         StateMachine::state_id *master_nested_state);
@@ -54,6 +66,7 @@ class SPI {
 
     void transmit_state();
     void request_control_parameters();
+    void request_dc_link_voltage();
 
     void start_test_pwm(float duty_cycle_u, float duty_cycle_v,
                         float duty_cycle_w);
@@ -65,6 +78,9 @@ class SPI {
 
     void start_space_vector(float modulation_index,
                             float modulation_frequency_hz);
+
+    void fix_dc_link_voltage(float voltage);
+    void unfix_dc_link_voltage();
 };
 
 };  // namespace BCU::Communication

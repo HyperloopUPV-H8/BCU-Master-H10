@@ -49,6 +49,14 @@ void CAN::update() {
                        sizeof(requested_modulation_frequency_hz));
                 has_received_start_space_vector = true;
                 break;
+            case fix_dc_link_voltage_id:
+                memcpy(&requested_dc_link_voltage, last_read.rx_data.data(),
+                       sizeof(requested_dc_link_voltage));
+                has_received_fix_dc_link_voltage = true;
+                break;
+            case unfix_dc_link_voltage_id:
+                has_received_unfix_dc_link_voltage = true;
+                break;
         }
     }
 }
@@ -86,6 +94,29 @@ void CAN::transmit_control_parameters(float duty_cycle_u, float duty_cycle_v,
     FDCAN::transmit(can_id, control_parameters_id,
                     reinterpret_cast<const char *>(buffer.data()),
                     FDCAN::DLC::BYTES_6);
+}
+
+void CAN::transmit_dc_link_voltage(float average_dc_link_voltage,
+                                   float dc_link_voltage_1,
+                                   float dc_link_voltage_2,
+                                   float dc_link_voltage_3,
+                                   float dc_link_voltage_4) {
+    uint8_t encoded_voltage_1{(uint8_t)dc_link_voltage_1};
+    uint8_t encoded_voltage_2{(uint8_t)dc_link_voltage_2};
+    uint8_t encoded_voltage_3{(uint8_t)dc_link_voltage_3};
+    uint8_t encoded_voltage_4{(uint8_t)dc_link_voltage_4};
+
+    std::array<uint8_t, 4 * sizeof(uint8_t) + sizeof(float)> buffer;
+
+    memcpy(buffer.data(), &average_dc_link_voltage, sizeof(float));
+    memcpy(buffer.data() + 4, &encoded_voltage_1, sizeof(encoded_voltage_1));
+    memcpy(buffer.data() + 5, &encoded_voltage_2, sizeof(encoded_voltage_2));
+    memcpy(buffer.data() + 6, &encoded_voltage_3, sizeof(encoded_voltage_3));
+    memcpy(buffer.data() + 7, &encoded_voltage_4, sizeof(encoded_voltage_4));
+
+    FDCAN::transmit(can_id, dc_link_id,
+                    reinterpret_cast<const char *>(buffer.data()),
+                    FDCAN::DLC::BYTES_8);
 }
 
 }  // namespace BCU::Communication

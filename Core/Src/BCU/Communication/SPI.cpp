@@ -20,8 +20,15 @@ SPI::SPI(StateMachine::state_id *master_general_state,
               &duty_cycle_u, &duty_cycle_v, &duty_cycle_w)),
       start_space_vector_order(
           Shared::Communication::create_start_space_vector_order(
-              &requested_modulation_index,
-              &requested_modulation_frequency_hz)) {}
+              &requested_modulation_index, &requested_modulation_frequency_hz)),
+      fix_dc_link_voltage_order(
+          Shared::Communication::create_fix_dc_link_voltage_order(
+              &requested_dc_link_voltage)),
+      unfix_dc_link_voltage_order(
+          Shared::Communication::create_unfix_dc_link_voltage_order()),
+      dc_link_order(Shared::Communication::create_dc_link_order(
+          &average_dc_link_voltage, &dc_link_voltage_1, &dc_link_voltage_2,
+          &dc_link_voltage_3, &dc_link_voltage_4)) {}
 
 SPI::SPI(Pin &spi_ready_slave_pin, StateMachine::state_id *master_general_state,
          StateMachine::state_id *master_nested_state)
@@ -39,6 +46,10 @@ void SPI::transmit_state() {
 
 void SPI::request_control_parameters() {
     ::SPI::master_transmit_Order(spi_id, control_parameters_order);
+}
+
+void SPI::request_dc_link_voltage() {
+    ::SPI::master_transmit_Order(spi_id, dc_link_order);
 }
 
 void SPI::start_test_pwm(float duty_cycle_u, float duty_cycle_v,
@@ -66,6 +77,15 @@ void SPI::start_space_vector(float modulation_index,
     requested_modulation_index = modulation_index;
     requested_modulation_frequency_hz = modulation_frequency_hz;
     ::SPI::master_transmit_Order(spi_id, start_space_vector_order);
+}
+
+void SPI::fix_dc_link_voltage(float voltage) {
+    requested_dc_link_voltage = voltage;
+    ::SPI::master_transmit_Order(spi_id, fix_dc_link_voltage_order);
+}
+
+void SPI::unfix_dc_link_voltage() {
+    ::SPI::master_transmit_Order(spi_id, unfix_dc_link_voltage_order);
 }
 
 };  // namespace BCU::Communication

@@ -21,8 +21,10 @@ Board::Board()
 
     Time::register_low_precision_alarm(50, [&]() { spi.transmit_state(); });
 
-    Time::register_low_precision_alarm(
-        100, [&]() { spi.request_control_parameters(); });
+    Time::register_low_precision_alarm(100, [&]() {
+        spi.request_control_parameters();
+        spi.request_dc_link_voltage();
+    });
 
     Time::register_low_precision_alarm(100, [&]() {
         can.transmit_state(state_machine.general_state_machine.current_state,
@@ -30,6 +32,10 @@ Board::Board()
                            spi.slave_general_state, spi.slave_nested_state);
         can.transmit_control_parameters(spi.duty_cycle_u, spi.duty_cycle_v,
                                         spi.duty_cycle_w);
+        can.transmit_dc_link_voltage(
+            spi.average_dc_link_voltage, spi.dc_link_voltage_1,
+            spi.dc_link_voltage_2, spi.dc_link_voltage_3,
+            spi.dc_link_voltage_4);
     });
 
     Time::register_low_precision_alarm(
@@ -141,6 +147,18 @@ void Board::update_operational() {
             (uint32_t)can.requested_dead_time_ns);
 
         can.has_received_configure_commutation_parameters = false;
+    }
+
+    if (can.has_received_fix_dc_link_voltage) {
+        spi.fix_dc_link_voltage(can.requested_dc_link_voltage);
+
+        can.has_received_fix_dc_link_voltage = false;
+    }
+
+    if (can.has_received_unfix_dc_link_voltage) {
+        spi.unfix_dc_link_voltage();
+
+        can.has_received_unfix_dc_link_voltage = false;
     }
 
     switch (state_machine.nested_state_machine.current_state) {
