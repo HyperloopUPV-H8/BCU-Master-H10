@@ -26,9 +26,19 @@ extern Pin& buffer_enable_1_pin;
 extern Pin& buffer_enable_2_pin;
 extern Pin& buffer_enable_3_pin;
 
-extern Pin& inverter_1_temp_pin;
-extern Pin& inverter_2_temp_pin;
-extern Pin& inverter_3_temp_pin;
-extern Pin& inverter_4_temp_pin;
+extern Pin& inverter_temp_1_pin;
+extern Pin& inverter_temp_2_pin;
+extern Pin& inverter_temp_3_pin;
+extern Pin& inverter_temp_4_pin;
+
+extern Pin& booster_temp_1_pin;
+extern Pin& booster_temp_2_pin;
+extern Pin& booster_temp_3_pin;
+extern Pin& booster_temp_4_pin;
+
+extern Pin& gpio_1_pin;
+extern Pin& gpio_2_pin;
+extern Pin& gpio_3_pin;
+extern Pin& gpio_4_pin;
 
 };  // namespace BCU::Pinout

@@ -43,6 +43,11 @@
 #define CONTACTOR2 PF1
 #define CONTACTOR3 PE6
 
+#define GPIO_1 PD8
+#define GPIO_2 PD9
+#define GPIO_3 PD10
+#define GPIO_4 PD11
+
 namespace BCU::Pinout {
 
 Pin& uart_tx_pin{UART_TX_M_RX_S};
@@ -67,9 +72,19 @@ Pin& buffer_enable_1_pin{ENABLE_BUFFER_M_1};
 Pin& buffer_enable_2_pin{ENABLE_BUFFER_M_2};
 Pin& buffer_enable_3_pin{ENABLE_BUFFER_M_3};
 
-Pin& inverter_1_temp_pin{TEMP1};
-Pin& inverter_2_temp_pin{TEMP2};
-Pin& inverter_3_temp_pin{TEMP3};
-Pin& inverter_4_temp_pin{TEMP4};
+Pin& inverter_temp_1_pin{TEMP1};
+Pin& inverter_temp_2_pin{TEMP2};
+Pin& inverter_temp_3_pin{TEMP3};
+Pin& inverter_temp_4_pin{TEMP4};
+
+Pin& booster_temp_1_pin{PT100_1};
+Pin& booster_temp_2_pin{PT100_2};
+Pin& booster_temp_3_pin{PT100_3};
+Pin& booster_temp_4_pin{PT100_4};
+
+Pin& gpio_1_pin{GPIO_1};
+Pin& gpio_2_pin{GPIO_2};
+Pin& gpio_3_pin{GPIO_3};
+Pin& gpio_4_pin{GPIO_4};
 
 };  // namespace BCU::Pinout
