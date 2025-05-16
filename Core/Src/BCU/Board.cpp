@@ -26,8 +26,10 @@ STLIBHandle::STLIBHandle(string mac, string ip, string subnet_mask,
 void STLIBHandle::update() { STLIB::update(); }
 
 Board::Board() {
-    initialize_state_machine();
+    motor_driver.disable();
     leds.signal_connecting();
+
+    initialize_state_machine();
 
     Time::register_low_precision_alarm(
         1, [&]() { should_update_low_frequency = true; });
@@ -89,8 +91,12 @@ void Board::initialize_state_machine() {
     general_state_machine.add_enter_action([&]() { leds.signal_operational(); },
                                            GeneralState::Operational);
 
-    general_state_machine.add_enter_action([&]() { leds.signal_fault(); },
-                                           GeneralState::Fault);
+    general_state_machine.add_enter_action(
+        [&]() {
+            motor_driver.disable_and_lock();
+            leds.signal_fault();
+        },
+        GeneralState::Fault);
 
     // Operational State Machine
 
@@ -102,12 +108,20 @@ void Board::initialize_state_machine() {
     //     Enter Actions
 
     operational_state_machine.add_enter_action(
-        [&]() { leds.signal_inverter_off(); }, OperationalState::Idle);
+        [&]() {
+            leds.signal_inverter_off();
+            motor_driver.disable();
+        },
+        OperationalState::Idle);
 
     //     Exit Actions
 
     operational_state_machine.add_exit_action(
-        [&]() { leds.signal_inverter_on(); }, OperationalState::Idle);
+        [&]() {
+            leds.signal_inverter_on();
+            motor_driver.enable();
+        },
+        OperationalState::Idle);
 }
 
 };  // namespace BCU

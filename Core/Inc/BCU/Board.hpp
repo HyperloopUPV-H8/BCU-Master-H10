@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BCU/Actuators/LEDs.hpp"
+#include "BCU/Actuators/MotorDriver.hpp"
 #include "ST-LIB.hpp"
 
 namespace BCU {
@@ -43,6 +44,8 @@ class Board {
                                                GeneralState::Fault};
 
     Actuators::LEDs leds;
+
+    Actuators::MotorDriver motor_driver;
 
     STLIBHandle stlib{};
 
