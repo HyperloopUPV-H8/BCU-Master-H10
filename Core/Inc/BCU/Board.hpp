@@ -2,7 +2,9 @@
 
 #include "BCU/Actuators/LEDs.hpp"
 #include "BCU/Actuators/MotorDriver.hpp"
+#include "BCU/Communication/SPI.hpp"
 #include "ST-LIB.hpp"
+#include "Shared/StateMachine.hpp"
 
 namespace BCU {
 
@@ -36,16 +38,18 @@ class Board {
         Precharge = 1,
     };
 
-    StateMachine general_state_machine{GeneralState::Connecting};
-    StateMachine operational_state_machine{OperationalState::Idle};
+    Shared::State::SharedStateMachine state_machine;
 
     volatile bool should_update_low_frequency{false};
-    ProtectionManagerHandle protection_manager{general_state_machine,
+    ProtectionManagerHandle protection_manager{state_machine.general,
                                                GeneralState::Fault};
 
     Actuators::LEDs leds;
 
     Actuators::MotorDriver motor_driver;
+
+    Communication::SPI spi{::SPI::spi1, &state_machine.general.current_state,
+                           &state_machine.operational.current_state};
 
     STLIBHandle stlib{};
 

@@ -33,10 +33,12 @@ Board::Board() {
 
     Time::register_low_precision_alarm(
         1, [&]() { should_update_low_frequency = true; });
+
+    Time::register_low_precision_alarm(50, [&]() { spi.sync_state(); });
 };
 
 void Board::update() {
-    switch (general_state_machine.current_state) {
+    switch (state_machine.general.current_state) {
         case GeneralState::Connecting:
             update_connecting();
             break;
@@ -53,7 +55,7 @@ void Board::update() {
         protection_manager.update_low_frequency();
     }
 
-    general_state_machine.check_transitions();
+    state_machine.general.check_transitions();
     protection_manager.update_high_frequency();
     stlib.update();
 }
@@ -61,7 +63,7 @@ void Board::update() {
 void Board::update_connecting() {}
 
 void Board::update_operational() {
-    switch (operational_state_machine.current_state) {
+    switch (state_machine.operational.current_state) {
         case OperationalState::Idle:
             update_operational_idle();
             break;
@@ -78,20 +80,26 @@ void Board::update_operational_idle() {}
 void Board::update_operational_precharge() {}
 
 void Board::initialize_state_machine() {
+    using GeneralState = Shared::State::SharedStateMachine::GeneralState;
+    using OperationalState = Shared::State::SharedStateMachine::NestedState;
+
     // General State Machine
 
-    general_state_machine.add_state(GeneralState::Operational);
-    general_state_machine.add_state(GeneralState::Fault);
+    //     Transitions
+
+    state_machine.general.add_transition(
+        GeneralState::Operational, GeneralState::Fault,
+        [&]() { return spi.slave_general_state == GeneralState::Fault; });
 
     //     Enter Actions
 
-    general_state_machine.add_enter_action([&]() { leds.signal_connecting(); },
+    state_machine.general.add_enter_action([&]() { leds.signal_connecting(); },
                                            GeneralState::Connecting);
 
-    general_state_machine.add_enter_action([&]() { leds.signal_operational(); },
+    state_machine.general.add_enter_action([&]() { leds.signal_operational(); },
                                            GeneralState::Operational);
 
-    general_state_machine.add_enter_action(
+    state_machine.general.add_enter_action(
         [&]() {
             motor_driver.disable_and_lock();
             leds.signal_fault();
@@ -100,14 +108,9 @@ void Board::initialize_state_machine() {
 
     // Operational State Machine
 
-    general_state_machine.add_state_machine(operational_state_machine,
-                                            GeneralState::Operational);
-
-    operational_state_machine.add_state(OperationalState::Precharge);
-
     //     Enter Actions
 
-    operational_state_machine.add_enter_action(
+    state_machine.operational.add_enter_action(
         [&]() {
             leds.signal_inverter_off();
             motor_driver.disable();
@@ -116,7 +119,7 @@ void Board::initialize_state_machine() {
 
     //     Exit Actions
 
-    operational_state_machine.add_exit_action(
+    state_machine.operational.add_exit_action(
         [&]() {
             leds.signal_inverter_on();
             motor_driver.enable();
