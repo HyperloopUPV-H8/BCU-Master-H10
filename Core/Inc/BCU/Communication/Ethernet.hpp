@@ -230,7 +230,7 @@ class Ethernet {
     void send_motor_driver_sense();
     void send_temperature_sense();
 
-    bool is_connected() const;
+    bool is_connected();
 };
 
 };  // namespace BCU::Communication
