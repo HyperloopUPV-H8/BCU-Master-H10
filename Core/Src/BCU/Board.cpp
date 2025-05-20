@@ -63,7 +63,7 @@ void Board::update() {
 void Board::update_connecting() {}
 
 void Board::update_operational() {
-    switch (state_machine.operational.current_state) {
+    switch (state_machine.nested.current_state) {
         case OperationalState::Idle:
             update_operational_idle();
             break;
@@ -110,7 +110,7 @@ void Board::initialize_state_machine() {
 
     //     Enter Actions
 
-    state_machine.operational.add_enter_action(
+    state_machine.nested.add_enter_action(
         [&]() {
             leds.signal_inverter_off();
             motor_driver.disable();
@@ -119,7 +119,7 @@ void Board::initialize_state_machine() {
 
     //     Exit Actions
 
-    state_machine.operational.add_exit_action(
+    state_machine.nested.add_exit_action(
         [&]() {
             leds.signal_inverter_on();
             motor_driver.enable();

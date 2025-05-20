@@ -49,7 +49,7 @@ class Board {
     Actuators::MotorDriver motor_driver;
 
     Communication::SPI spi{::SPI::spi1, &state_machine.general.current_state,
-                           &state_machine.operational.current_state};
+                           &state_machine.nested.current_state};
 
     STLIBHandle stlib{};
 
