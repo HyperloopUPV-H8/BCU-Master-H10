@@ -31,8 +31,13 @@ Board::Board() {
 
     initialize_state_machine();
 
-    Time::register_low_precision_alarm(
-        1, [&]() { should_update_low_frequency = true; });
+    Time::register_low_precision_alarm(1, [&]() {
+        should_update_low_frequency = true;
+        should_send_data_1khz = true;
+    });
+
+    Time::register_low_precision_alarm(16,
+                                       [&]() { should_send_data_60hz = true; });
 
     Time::register_low_precision_alarm(50, [&]() { spi.sync_state(); });
 };
@@ -53,6 +58,22 @@ void Board::update() {
     if (should_update_low_frequency) {
         should_update_low_frequency = false;
         protection_manager.update_low_frequency();
+    }
+
+    if (should_send_data_1khz) {
+        should_send_data_1khz = false;
+        ethernet.send_commutation_details();
+        ethernet.send_clarke_park_transform();
+        ethernet.send_inverse_clarke_park_transform();
+        ethernet.send_control_information();
+        ethernet.send_current_sense();
+        ethernet.send_encoder_sense();
+    }
+    if (should_send_data_60hz) {
+        should_send_data_60hz = false;
+        ethernet.send_motor_driver_sense();
+        ethernet.send_temperature_sense();
+        ethernet.send_state();
     }
 
     state_machine.general.check_transitions();
@@ -88,21 +109,34 @@ void Board::initialize_state_machine() {
     //     Transitions
 
     state_machine.general.add_transition(
+        GeneralState::Connecting, GeneralState::Operational,
+        [&]() { return ethernet.is_connected(); });
+
+    state_machine.general.add_transition(
         GeneralState::Operational, GeneralState::Fault,
         [&]() { return spi.slave_general_state == GeneralState::Fault; });
 
     //     Enter Actions
 
-    state_machine.general.add_enter_action([&]() { leds.signal_connecting(); },
-                                           GeneralState::Connecting);
+    state_machine.general.add_enter_action(
+        [&]() {
+            leds.signal_connecting();
+            ethernet.send_state();
+        },
+        GeneralState::Connecting);
 
-    state_machine.general.add_enter_action([&]() { leds.signal_operational(); },
-                                           GeneralState::Operational);
+    state_machine.general.add_enter_action(
+        [&]() {
+            leds.signal_operational();
+            ethernet.send_state();
+        },
+        GeneralState::Operational);
 
     state_machine.general.add_enter_action(
         [&]() {
             motor_driver.disable_and_lock();
             leds.signal_fault();
+            ethernet.send_state();
         },
         GeneralState::Fault);
 
@@ -114,8 +148,21 @@ void Board::initialize_state_machine() {
         [&]() {
             leds.signal_inverter_off();
             motor_driver.disable();
+            ethernet.send_state();
         },
         OperationalState::Idle);
+
+    state_machine.nested.add_enter_action([&]() { ethernet.send_state(); },
+                                          OperationalState::Precharge);
+
+    state_machine.nested.add_enter_action([&]() { ethernet.send_state(); },
+                                          OperationalState::Ready);
+
+    state_machine.nested.add_enter_action([&]() { ethernet.send_state(); },
+                                          OperationalState::Testing);
+
+    state_machine.nested.add_enter_action([&]() { ethernet.send_state(); },
+                                          OperationalState::Boosting);
 
     //     Exit Actions
 

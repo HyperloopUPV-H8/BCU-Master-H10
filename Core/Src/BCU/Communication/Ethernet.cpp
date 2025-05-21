@@ -10,7 +10,7 @@ Ethernet::Ethernet(
     const CurrentSenseData &current_sense,
     const EncoderSenseData &encoder_sense,
     const MotorDriverSenseData &motor_driver_sense,
-    const TemperatureSenseData &temperature_sense)
+    const TemperatureSenseData &temperature_sense, const StateData &state_data)
     : commutation_details_packet{21711,
                                  commutation_details.duty_cycle_u,
                                  commutation_details.duty_cycle_v,
@@ -98,42 +98,51 @@ Ethernet::Ethernet(
           temperature_sense.motor_3_temperature,
           temperature_sense.motor_4_temperature,
       },
+      state_packet{
+          21719,
+          state_data.master_general_state,
+          state_data.master_operational_state,
+          state_data.slave_general_state,
+          state_data.slave_operational_state,
+      },
       master_data{local_ip, master_data_port, master_ip, master_data_port},
       master_command{local_ip, master_command_port},
       lcu_command{local_ip, lcu_command_source_port, lcu_ip,
                   lcu_command_destination_port} {}
 
-void Ethernet::send_commutation_details() {
-    master_data.send_packet(commutation_details_packet);
+bool Ethernet::send_commutation_details() {
+    return master_data.send_packet(commutation_details_packet);
 }
 
-void Ethernet::send_clarke_park_transform() {
-    master_data.send_packet(clarke_park_transform_packet);
+bool Ethernet::send_clarke_park_transform() {
+    return master_data.send_packet(clarke_park_transform_packet);
 }
 
-void Ethernet::send_inverse_clarke_park_transform() {
-    master_data.send_packet(inverse_clarke_park_transform_packet);
+bool Ethernet::send_inverse_clarke_park_transform() {
+    return master_data.send_packet(inverse_clarke_park_transform_packet);
 }
 
-void Ethernet::send_control_information() {
-    master_data.send_packet(control_information_packet);
+bool Ethernet::send_control_information() {
+    return master_data.send_packet(control_information_packet);
 }
 
-void Ethernet::send_current_sense() {
-    master_data.send_packet(current_sense_packet);
+bool Ethernet::send_current_sense() {
+    return master_data.send_packet(current_sense_packet);
 }
 
-void Ethernet::send_encoder_sense() {
-    master_data.send_packet(encoder_sense_packet);
+bool Ethernet::send_encoder_sense() {
+    return master_data.send_packet(encoder_sense_packet);
 }
 
-void Ethernet::send_motor_driver_sense() {
-    master_data.send_packet(motor_driver_sense_packet);
+bool Ethernet::send_motor_driver_sense() {
+    return master_data.send_packet(motor_driver_sense_packet);
 }
 
-void Ethernet::send_temperature_sense() {
-    master_data.send_packet(temperature_sense_packet);
+bool Ethernet::send_temperature_sense() {
+    return master_data.send_packet(temperature_sense_packet);
 }
+
+bool Ethernet::send_state() { return master_data.send_packet(state_packet); }
 
 bool Ethernet::is_connected() {
     return master_command.is_connected() && lcu_command.is_connected();

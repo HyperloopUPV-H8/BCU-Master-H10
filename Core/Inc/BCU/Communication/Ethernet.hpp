@@ -195,6 +195,13 @@ class Ethernet {
         float *motor_4_temperature;
     };
 
+    struct StateData {
+        StateMachine::state_id *master_general_state;
+        StateMachine::state_id *master_operational_state;
+        StateMachine::state_id *slave_general_state;
+        StateMachine::state_id *slave_operational_state;
+    };
+
    private:
     HeapPacket commutation_details_packet;
     HeapPacket clarke_park_transform_packet;
@@ -204,6 +211,7 @@ class Ethernet {
     HeapPacket encoder_sense_packet;
     HeapPacket motor_driver_sense_packet;
     HeapPacket temperature_sense_packet;
+    HeapPacket state_packet;
 
     DatagramSocket master_data;
     ServerSocket master_command;
@@ -219,16 +227,18 @@ class Ethernet {
         const CurrentSenseData &current_sense,
         const EncoderSenseData &encoder_sense,
         const MotorDriverSenseData &motor_driver_sense,
-        const TemperatureSenseData &temperature_sense);
+        const TemperatureSenseData &temperature_sense,
+        const StateData &state_data);
 
-    void send_commutation_details();
-    void send_clarke_park_transform();
-    void send_inverse_clarke_park_transform();
-    void send_control_information();
-    void send_current_sense();
-    void send_encoder_sense();
-    void send_motor_driver_sense();
-    void send_temperature_sense();
+    bool send_commutation_details();
+    bool send_clarke_park_transform();
+    bool send_inverse_clarke_park_transform();
+    bool send_control_information();
+    bool send_current_sense();
+    bool send_encoder_sense();
+    bool send_motor_driver_sense();
+    bool send_temperature_sense();
+    bool send_state();
 
     bool is_connected();
 };
