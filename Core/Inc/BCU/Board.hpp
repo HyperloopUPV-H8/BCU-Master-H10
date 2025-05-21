@@ -4,6 +4,7 @@
 #include "BCU/Actuators/MotorDriver.hpp"
 #include "BCU/Communication/Ethernet.hpp"
 #include "BCU/Communication/SPI.hpp"
+#include "BCU/Sensors/Temperature.hpp"
 #include "ST-LIB.hpp"
 #include "Shared/StateMachine.hpp"
 
@@ -42,11 +43,14 @@ class Board {
     volatile bool should_update_low_frequency{false};
     volatile bool should_send_data_1khz{false};
     volatile bool should_send_data_60hz{false};
+    volatile bool should_read_temperature{false};
 
     Shared::State::SharedStateMachine state_machine;
 
     ProtectionManagerHandle protection_manager{state_machine.general,
                                                GeneralState::Fault};
+
+    Sensors::Temperature temperature_sense;
 
     Actuators::LEDs leds;
 
@@ -128,14 +132,14 @@ class Board {
             .driver_4_fault{nullptr},
         },
         {
-            .driver_1_temperature{nullptr},
-            .motor_1_temperature{nullptr},
-            .driver_2_temperature{nullptr},
-            .motor_2_temperature{nullptr},
-            .driver_3_temperature{nullptr},
-            .motor_3_temperature{nullptr},
-            .driver_4_temperature{nullptr},
-            .motor_4_temperature{nullptr},
+            .driver_1_temperature{temperature_sense.get_driver_temperature(0)},
+            .motor_1_temperature{temperature_sense.get_motor_temperature(0)},
+            .driver_2_temperature{temperature_sense.get_driver_temperature(1)},
+            .motor_2_temperature{temperature_sense.get_motor_temperature(1)},
+            .driver_3_temperature{temperature_sense.get_driver_temperature(2)},
+            .motor_3_temperature{temperature_sense.get_motor_temperature(2)},
+            .driver_4_temperature{temperature_sense.get_driver_temperature(3)},
+            .motor_4_temperature{temperature_sense.get_motor_temperature(3)},
         },
         {
             .master_general_state{&state_machine.general.current_state},
@@ -147,6 +151,7 @@ class Board {
     STLIBHandle stlib{};
 
     void initialize_state_machine();
+    void initialize_protections();
 
     void update_connecting();
     void update_operational();

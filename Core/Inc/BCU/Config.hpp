@@ -1,0 +1,4 @@
+#pragma once
+
+#define USING_MOTOR_TEMPERATURE 0
+#define USING_DRIVER_TEMPERATURE 0

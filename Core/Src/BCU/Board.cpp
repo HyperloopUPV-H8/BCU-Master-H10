@@ -36,8 +36,10 @@ Board::Board() {
         should_send_data_1khz = true;
     });
 
-    Time::register_low_precision_alarm(16,
-                                       [&]() { should_send_data_60hz = true; });
+    Time::register_low_precision_alarm(16, [&]() {
+        should_send_data_60hz = true;
+        should_read_temperature = true;
+    });
 
     Time::register_low_precision_alarm(50, [&]() { spi.sync_state(); });
 };
@@ -53,6 +55,12 @@ void Board::update() {
         case GeneralState::Fault:
             update_fault();
             break;
+    }
+
+    if (should_read_temperature) {
+        should_read_temperature = false;
+        temperature_sense.read_motor_temperature();
+        temperature_sense.read_driver_temperature();
     }
 
     if (should_update_low_frequency) {
@@ -112,10 +120,6 @@ void Board::initialize_state_machine() {
         GeneralState::Connecting, GeneralState::Operational,
         [&]() { return ethernet.is_connected(); });
 
-    state_machine.general.add_transition(
-        GeneralState::Operational, GeneralState::Fault,
-        [&]() { return spi.slave_general_state == GeneralState::Fault; });
-
     //     Enter Actions
 
     state_machine.general.add_enter_action(
@@ -172,6 +176,23 @@ void Board::initialize_state_machine() {
             motor_driver.enable();
         },
         OperationalState::Idle);
+}
+
+void Board::initialize_protections() {
+    for (uint8_t i{0}; i < 4; ++i) {
+        add_protection(temperature_sense.get_motor_temperature(i),
+                       Boundary<float, BELOW>(80.0f, 100.0f),
+                       Boundary<float, ABOVE>(-40.0f, 100.0f));
+        add_protection(temperature_sense.get_driver_temperature(i),
+                       Boundary<float, BELOW>(80.0f, 100.0f),
+                       Boundary<float, ABOVE>(-40.0f, 100.0f));
+    }
+
+    add_high_frequency_protection(
+        &spi.slave_general_state,
+        Boundary<StateMachine::state_id, EQUALS>(GeneralState::Fault));
+
+    protection_manager.start();
 }
 
 };  // namespace BCU
