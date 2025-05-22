@@ -4,19 +4,19 @@
 
 namespace BCU::Communication {
 
-template <uint16_t id, typename... Types>
+template <uint16_t id>
 class PolledOrder {
     HeapOrder order;
 
-    static volatile bool has_been_received{false};
-    static void on_receive() { has_been_received = true; }
+    static inline volatile bool has_been_received_flag{false};
+    static void on_receive() { has_been_received_flag = true; }
 
    public:
-    PolledOrder() : order(id, on_receive) {}
-    PolledOrder(Types &...values) : order(id, on_receive, values...) {}
+    template <typename... Types>
+    PolledOrder(Types *...values) : order{id, on_receive, values...} {}
 
-    static bool has_been_received() { return has_been_received; }
-    static void clear_receive_flag() { has_been_received = false; }
+    static bool has_been_received() { return has_been_received_flag; }
+    static void clear_receive_flag() { has_been_received_flag = false; }
 };
 
 class Ethernet {
@@ -38,33 +38,41 @@ class Ethernet {
 
     PolledOrder<21702> precharge_filter_order;
 
-    PolledOrder<21703, float, float, float> test_pwm_order{
-        test_pwm_parameters.duty_cycle_u, test_pwm_parameters.duty_cycle_v,
-        test_pwm_parameters.duty_cycle_w};
+    PolledOrder<21703> test_pwm_order{
+        &test_pwm_parameters.duty_cycle_u,
+        &test_pwm_parameters.duty_cycle_v,
+        &test_pwm_parameters.duty_cycle_w,
+    };
 
-    PolledOrder<21704, float, float, float> test_space_vector_order{
-        space_vector_parameters.modulation_index,
-        space_vector_parameters.modulation_frequency_hz,
-        space_vector_parameters.linear_speed};
+    PolledOrder<21704> test_space_vector_order{
+        &space_vector_parameters.modulation_index,
+        &space_vector_parameters.modulation_frequency_hz,
+        &space_vector_parameters.linear_speed,
+    };
 
-    PolledOrder<21705, float, float> emulate_current_control_order{
-        emulated_current_control_parameters.current_ref,
-        emulated_current_control_parameters.linear_speed};
+    PolledOrder<21705> emulate_current_control_order{
+        &emulated_current_control_parameters.current_ref,
+        &emulated_current_control_parameters.linear_speed,
+    };
 
-    PolledOrder<21706, float> enable_current_control_order{
-        current_control_parameters.current_ref};
+    PolledOrder<21706> enable_current_control_order{
+        &current_control_parameters.current_ref,
+    };
 
-    PolledOrder<21707, float> enable_speed_control_order{
-        speed_control_parameters.speed_ref};
+    PolledOrder<21707> enable_speed_control_order{
+        &speed_control_parameters.speed_ref,
+    };
 
-    PolledOrder<21708, float> fix_dc_link_voltage_order{
-        fix_dc_link_voltage_parameters.dc_link_voltage};
+    PolledOrder<21708> fix_dc_link_voltage_order{
+        &fix_dc_link_voltage_parameters.dc_link_voltage,
+    };
 
     PolledOrder<21709> unfix_dc_link_voltage_order;
 
-    PolledOrder<21710, uint32_t, uint16_t> configure_commutation_order{
-        configure_commutation_parameters.commutation_frequency_hz,
-        configure_commutation_parameters.dead_time_ns};
+    PolledOrder<21710> configure_commutation_order{
+        &configure_commutation_parameters.commutation_frequency_hz,
+        &configure_commutation_parameters.dead_time_ns,
+    };
 
     struct {
         float duty_cycle_u{0.0f};
@@ -185,14 +193,14 @@ class Ethernet {
     };
 
     struct TemperatureSenseData {
-        float *driver_1_temperature;
         float *motor_1_temperature;
-        float *driver_2_temperature;
         float *motor_2_temperature;
-        float *driver_3_temperature;
         float *motor_3_temperature;
-        float *driver_4_temperature;
         float *motor_4_temperature;
+        float *driver_1_temperature;
+        float *driver_2_temperature;
+        float *driver_3_temperature;
+        float *driver_4_temperature;
     };
 
     struct StateData {

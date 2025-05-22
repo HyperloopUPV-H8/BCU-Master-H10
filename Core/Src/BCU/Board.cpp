@@ -100,6 +100,8 @@ void Board::update_operational() {
             update_operational_precharge();
             break;
     }
+
+    state_machine.nested.force_change_state(spi.slave_operational_state);
 }
 
 void Board::update_fault() {}
@@ -145,6 +147,8 @@ void Board::initialize_state_machine() {
         GeneralState::Fault);
 
     // Operational State Machine
+
+    //     Transitions
 
     //     Enter Actions
 
