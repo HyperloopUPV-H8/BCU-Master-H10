@@ -29,16 +29,8 @@ class STLIBHandle {
 };
 
 class Board {
-    enum GeneralState : uint8_t {
-        Connecting = 0,
-        Operational = 1,
-        Fault = 2,
-    };
-
-    enum OperationalState : uint8_t {
-        Idle = 0,
-        Precharge = 1,
-    };
+    using GeneralState = Shared::State::SharedStateMachine::GeneralState;
+    using OperationalState = Shared::State::SharedStateMachine::NestedState;
 
     volatile bool should_update_low_frequency{false};
     volatile bool should_send_data_1khz{false};
@@ -53,7 +45,6 @@ class Board {
     Sensors::Temperature temperature_sense;
 
     Actuators::LEDs leds;
-
     Actuators::MotorDriver motor_driver;
 
     Communication::SPI spi{::SPI::spi1, &state_machine.general.current_state,
@@ -155,7 +146,7 @@ class Board {
         },
     };
 
-    STLIBHandle stlib{};
+    STLIBHandle stlib;
 
     void initialize_state_machine();
     void initialize_protections();
@@ -166,9 +157,14 @@ class Board {
 
     void update_operational_idle();
     void update_operational_precharge();
+    void update_operational_ready();
+    void update_operational_boosting();
+    void update_operational_testing();
 
    public:
     Board();
+
     void update();
 };
+
 };  // namespace BCU

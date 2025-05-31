@@ -26,10 +26,11 @@ STLIBHandle::STLIBHandle(string mac, string ip, string subnet_mask,
 void STLIBHandle::update() { STLIB::update(); }
 
 Board::Board() {
-    motor_driver.disable();
+    motor_driver.turn_off();
     leds.signal_connecting();
 
     initialize_state_machine();
+    initialize_protections();
 
     Time::register_low_precision_alarm(1, [&]() {
         should_update_low_frequency = true;
@@ -77,6 +78,7 @@ void Board::update() {
         ethernet.send_current_sense();
         ethernet.send_encoder_sense();
     }
+
     if (should_send_data_60hz) {
         should_send_data_60hz = false;
         ethernet.send_motor_driver_sense();
@@ -99,6 +101,15 @@ void Board::update_operational() {
         case OperationalState::Precharge:
             update_operational_precharge();
             break;
+        case OperationalState::Ready:
+            update_operational_ready();
+            break;
+        case OperationalState::Boosting:
+            update_operational_boosting();
+            break;
+        case OperationalState::Testing:
+            update_operational_testing();
+            break;
     }
 
     state_machine.nested.force_change_state(spi.slave_operational_state);
@@ -109,6 +120,12 @@ void Board::update_fault() {}
 void Board::update_operational_idle() {}
 
 void Board::update_operational_precharge() {}
+
+void Board::update_operational_ready() {}
+
+void Board::update_operational_boosting() {}
+
+void Board::update_operational_testing() {}
 
 void Board::initialize_state_machine() {
     using GeneralState = Shared::State::SharedStateMachine::GeneralState;
@@ -140,7 +157,7 @@ void Board::initialize_state_machine() {
 
     state_machine.general.add_enter_action(
         [&]() {
-            motor_driver.disable_and_lock();
+            motor_driver.turn_off_and_lock();
             leds.signal_fault();
             ethernet.send_state();
         },
@@ -155,7 +172,7 @@ void Board::initialize_state_machine() {
     state_machine.nested.add_enter_action(
         [&]() {
             leds.signal_inverter_off();
-            motor_driver.disable();
+            motor_driver.turn_off();
             ethernet.send_state();
         },
         OperationalState::Idle);
@@ -177,7 +194,7 @@ void Board::initialize_state_machine() {
     state_machine.nested.add_exit_action(
         [&]() {
             leds.signal_inverter_on();
-            motor_driver.enable();
+            motor_driver.turn_on();
         },
         OperationalState::Idle);
 }

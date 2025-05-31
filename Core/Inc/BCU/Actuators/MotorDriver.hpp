@@ -13,10 +13,10 @@ class MotorDriver {
    public:
     MotorDriver() = default;
 
-    void enable();
-    void disable();
+    void turn_on();
+    void turn_off();
 
-    bool disable_and_lock();
+    bool turn_off_and_lock();
 };
 
 };  // namespace BCU::Actuators

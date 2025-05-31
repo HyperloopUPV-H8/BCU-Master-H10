@@ -2,8 +2,6 @@
 
 namespace BCU::Sensors {
 
-Temperature::Temperature() {}
-
 void Temperature::read_motor_temperature() {
 #if USING_MOTOR_TEMPERATURE
     for (size_t i = 0; i < 4; i++) {

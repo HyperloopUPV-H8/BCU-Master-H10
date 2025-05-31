@@ -87,7 +87,7 @@ class Temperature {
         };
 
    public:
-    Temperature();
+    Temperature() = default;
 
     void read_motor_temperature();
     void read_driver_temperature();
