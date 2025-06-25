@@ -75,32 +75,32 @@ class Ethernet {
     };
 
     struct {
-        float duty_cycle_u{0.0f};
-        float duty_cycle_v{0.0f};
-        float duty_cycle_w{0.0f};
+        double duty_cycle_u{0.0f};
+        double duty_cycle_v{0.0f};
+        double duty_cycle_w{0.0f};
     } test_pwm_parameters;
 
     struct {
-        float modulation_index{0.0f};
-        float modulation_frequency_hz{0.0f};
-        float linear_speed{0.0f};
+        double modulation_index{0.0f};
+        double modulation_frequency_hz{0.0f};
+        double linear_speed{0.0f};
     } space_vector_parameters;
 
     struct {
-        float current_ref{0.0f};
-        float linear_speed{0.0f};
+        double current_ref{0.0f};
+        double linear_speed{0.0f};
     } emulated_current_control_parameters;
 
     struct {
-        float current_ref{0.0f};
+        double current_ref{0.0f};
     } current_control_parameters;
 
     struct {
-        float speed_ref{0.0f};
+        double speed_ref{0.0f};
     } speed_control_parameters;
 
     struct {
-        float dc_link_voltage{0.0f};
+        double dc_link_voltage{0.0f};
     } fix_dc_link_voltage_parameters;
 
     struct {
@@ -109,85 +109,85 @@ class Ethernet {
     } configure_commutation_parameters;
 
     struct CommutationDetailsData {
-        float *duty_cycle_u;
-        float *duty_cycle_v;
-        float *duty_cycle_w;
+        double *duty_cycle_u;
+        double *duty_cycle_v;
+        double *duty_cycle_w;
         uint32_t *commutation_frequency_hz;
         uint16_t *dead_time_ns;
     };
 
     struct ClarkeParkTransformData {
-        float *measured_current_d;
-        float *measured_current_q;
-        float *measured_current_alpha;
-        float *measured_current_beta;
-        float *measured_current_u;
-        float *measured_current_v;
-        float *measured_current_w;
-        float *electrical_angle;
+        double *measured_current_d;
+        double *measured_current_q;
+        double *measured_current_alpha;
+        double *measured_current_beta;
+        double *measured_current_u;
+        double *measured_current_v;
+        double *measured_current_w;
+        double *electrical_angle;
     };
 
     struct InverseClarkeParkTransformData {
-        float *target_voltage_d;
-        float *target_voltage_q;
-        float *target_voltage_alpha;
-        float *target_voltage_beta;
-        float *target_voltage_u;
-        float *target_voltage_v;
-        float *target_voltage_w;
-        float *dc_link_voltage;
+        double *target_voltage_d;
+        double *target_voltage_q;
+        double *target_voltage_alpha;
+        double *target_voltage_beta;
+        double *target_voltage_u;
+        double *target_voltage_v;
+        double *target_voltage_w;
+        double *dc_link_voltage;
     };
 
     struct ControlInformationData {
-        float *reference_current_d;
-        float *reference_current_q;
-        float *reference_speed;
-        float *error_current_d;
-        float *error_current_q;
-        float *error_speed;
+        double *reference_current_d;
+        double *reference_current_q;
+        double *reference_speed;
+        double *error_current_d;
+        double *error_current_q;
+        double *error_speed;
     };
 
     struct CurrentSenseData {
-        float *measured_current_u_1;
-        float *measured_current_v_1;
-        float *measured_current_w_1;
-        float *measured_current_u_2;
-        float *measured_current_v_2;
-        float *measured_current_w_2;
-        float *measured_current_u_3;
-        float *measured_current_v_3;
-        float *measured_current_w_3;
-        float *measured_current_u_4;
-        float *measured_current_v_4;
-        float *measured_current_w_4;
+        double *measured_current_u_1;
+        double *measured_current_v_1;
+        double *measured_current_w_1;
+        double *measured_current_u_2;
+        double *measured_current_v_2;
+        double *measured_current_w_2;
+        double *measured_current_u_3;
+        double *measured_current_v_3;
+        double *measured_current_w_3;
+        double *measured_current_u_4;
+        double *measured_current_v_4;
+        double *measured_current_w_4;
     };
 
     struct EncoderSenseData {
-        float *speetec_1_position;
-        float *speetec_1_velocity;
-        float *speetec_1_acceleration;
-        float *speetec_2_position;
-        float *speetec_2_velocity;
-        float *speetec_2_acceleration;
-        float *speetec_3_position;
-        float *speetec_3_velocity;
-        float *speetec_3_acceleration;
-        float *speetec_position;
-        float *speetec_velocity;
-        float *speetec_acceleration;
+        double *speetec_1_position;
+        double *speetec_1_velocity;
+        double *speetec_1_acceleration;
+        double *speetec_2_position;
+        double *speetec_2_velocity;
+        double *speetec_2_acceleration;
+        double *speetec_3_position;
+        double *speetec_3_velocity;
+        double *speetec_3_acceleration;
+        double *speetec_position;
+        double *speetec_velocity;
+        double *speetec_acceleration;
     };
 
     struct MotorDriverSenseData {
-        float *driver_1_dc_link_voltage;
+        double *driver_1_dc_link_voltage;
         bool *driver_1_ready;
         bool *driver_1_fault;
-        float *driver_2_dc_link_voltage;
+        double *driver_2_dc_link_voltage;
         bool *driver_2_ready;
         bool *driver_2_fault;
-        float *driver_3_dc_link_voltage;
+        double *driver_3_dc_link_voltage;
         bool *driver_3_ready;
         bool *driver_3_fault;
-        float *driver_4_dc_link_voltage;
+        double *driver_4_dc_link_voltage;
         bool *driver_4_ready;
         bool *driver_4_fault;
     };
