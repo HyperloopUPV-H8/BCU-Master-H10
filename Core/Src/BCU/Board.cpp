@@ -169,6 +169,14 @@ void Board::initialize_state_machine() {
 
     //     Transitions
 
+    // state_machine.nested.add_transition(
+    //     OperationalState::Idle, OperationalState::Precharge,
+    //     [&]() { return ethernet.has_received_precharge; });
+
+    state_machine.nested.add_transition(OperationalState::Ready,
+                                        OperationalState::Boosting,
+                                        [&]() { return dc_poles_ready; });
+
     //     Enter Actions
 
     state_machine.nested.add_enter_action(
@@ -179,8 +187,12 @@ void Board::initialize_state_machine() {
         },
         OperationalState::Idle);
 
-    state_machine.nested.add_enter_action([&]() { ethernet.send_state(); },
-                                          OperationalState::Precharge);
+    // state_machine.nested.add_enter_action(
+    //     [&]() {
+    //         ethernet.has_received_precharge = false;
+    //         ethernet.send_state();
+    //     },
+    //     OperationalState::Precharge);
 
     state_machine.nested.add_enter_action([&]() { ethernet.send_state(); },
                                           OperationalState::Ready);
@@ -190,6 +202,8 @@ void Board::initialize_state_machine() {
 
     state_machine.nested.add_enter_action([&]() { ethernet.send_state(); },
                                           OperationalState::Boosting);
+
+    //     Cyclic Actions
 
     //     Exit Actions
 

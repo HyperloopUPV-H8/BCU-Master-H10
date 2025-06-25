@@ -4,6 +4,7 @@
 #include "lwip.h"
 #endif
 
+#include "BCU/Board.hpp"
 #include "ST-LIB.hpp"
 
 bool transmit_can = false;
@@ -11,10 +12,10 @@ int main(void) {
 #ifdef SIM_ON
     SharedMemory::start();
 #endif
-    STLIB::start();
+    BCU::Board board{};
 
     while (1) {
-        STLIB::update();
+        board.update();
     }
 }
 

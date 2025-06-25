@@ -37,6 +37,8 @@ class Board {
     volatile bool should_send_data_60hz{false};
     volatile bool should_read_temperature{false};
 
+    volatile bool dc_poles_ready{false};
+
     Shared::State::SharedStateMachine state_machine;
 
     ProtectionManagerHandle protection_manager{state_machine.general,
@@ -47,7 +49,7 @@ class Board {
     Actuators::LEDs leds;
     Actuators::MotorDriver motor_driver;
 
-    Communication::SPI spi{::SPI::spi1, &state_machine.general.current_state,
+    Communication::SPI spi{::SPI::spi3, &state_machine.general.current_state,
                            &state_machine.nested.current_state};
 
     Communication::Ethernet ethernet{
