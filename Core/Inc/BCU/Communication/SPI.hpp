@@ -65,7 +65,7 @@ class SPI {
     double speetec_3_position{0.0f};
     double speetec_3_velocity{0.0f};
     double speetec_3_acceleration{0.0f};
-    uint8_t speetec_direction{0};
+    uint8_t speetec_direction_3{0};
     double speetec_position{0.0f};
     double speetec_velocity{0.0f};
     double speetec_acceleration{0.0f};
