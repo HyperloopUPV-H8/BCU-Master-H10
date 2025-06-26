@@ -285,12 +285,16 @@ void Board::initialize_state_machine() {
 
 void Board::initialize_protections() {
     for (uint8_t i{0}; i < 4; ++i) {
+        #if USING_MOTOR_TEMPERATURE 
         add_protection(temperature_sense.get_motor_temperature(i),
                        Boundary<float, BELOW>(80.0f, 100.0f),
                        Boundary<float, ABOVE>(-40.0f, 100.0f));
+        #endif
+        #if USING_DRIVER_TEMPERATURE
         add_protection(temperature_sense.get_driver_temperature(i),
                        Boundary<float, BELOW>(80.0f, 100.0f),
                        Boundary<float, ABOVE>(-40.0f, 100.0f));
+        #endif
     }
 
     add_high_frequency_protection(
