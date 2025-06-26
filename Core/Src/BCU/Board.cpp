@@ -73,18 +73,20 @@ void Board::update() {
 
     if (should_send_data_1khz) {
         should_send_data_1khz = false;
-        // ethernet.send_commutation_details();
-        // ethernet.send_clarke_park_transform();
-        // ethernet.send_inverse_clarke_park_transform();
-        // ethernet.send_control_information();
-        // ethernet.send_current_sense();
+        ethernet.send_commutation_details();
+        ethernet.send_clarke_park_transform();
+        ethernet.send_inverse_clarke_park_transform();
+        ethernet.send_control_information();
+        ethernet.send_current_sense();
         ethernet.send_encoder_sense();
     }
 
     if (should_send_data_60hz) {
         should_send_data_60hz = false;
-        // ethernet.send_motor_driver_sense();
-        // ethernet.send_temperature_sense();
+        ethernet.send_motor_driver_sense();
+        #if USING_DRIVER_TEMPERATURE || USING_MOTOR_TEMPERATURE
+        ethernet.send_temperature_sense();
+        #endif
         ethernet.send_state();
     }
 
