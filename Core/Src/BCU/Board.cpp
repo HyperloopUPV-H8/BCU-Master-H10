@@ -102,9 +102,6 @@ void Board::update_operational() {
         case OperationalState::Idle:
             update_operational_idle();
             break;
-        case OperationalState::Precharge:
-            update_operational_precharge();
-            break;
         case OperationalState::Ready:
             update_operational_ready();
             break;
@@ -122,31 +119,6 @@ void Board::update_operational() {
 void Board::update_fault() {}
 
 void Board::update_operational_idle() {}
-
-void Board::update_operational_precharge() {
-    if (ethernet.test_pwm_order.has_been_received()) {
-        ethernet.test_pwm_order.clear_receive_flag();
-
-        spi.send_test_pwm(ethernet.test_pwm_parameters.duty_cycle_u,
-                          ethernet.test_pwm_parameters.duty_cycle_v,
-                          ethernet.test_pwm_parameters.duty_cycle_w);
-    } else if (ethernet.test_space_vector_order.has_been_received()) {
-        ethernet.test_space_vector_order.clear_receive_flag();
-
-        spi.send_test_space_vector(
-            ethernet.space_vector_parameters.modulation_index,
-            ethernet.space_vector_parameters.modulation_frequency_hz);
-    } else if (ethernet.enable_current_control_order.has_been_received()) {
-        ethernet.enable_current_control_order.clear_receive_flag();
-
-        spi.send_enable_current_control(
-            ethernet.current_control_parameters.current_ref);
-    } else if (ethernet.enable_speed_control_order.has_been_received()) {
-        ethernet.enable_speed_control_order.clear_receive_flag();
-        spi.send_enable_speed_control(
-            ethernet.speed_control_parameters.speed_ref);
-    }
-}
 
 void Board::update_operational_ready() {
     if (!dc_poles_requested && spi.speetec_velocity > MIN_SPEED_FOR_BOOSTER) {
@@ -236,8 +208,10 @@ void Board::initialize_state_machine() {
     //     Transitions
 
     state_machine.nested.add_transition(
-        OperationalState::Idle, OperationalState::Precharge,
-        [&]() { return ethernet.precharge_filter_order.has_been_received(); });
+        OperationalState::Idle, OperationalState::Ready,
+        [&]() { 
+            return ethernet.enable_booster.has_been_received();
+        });
 
     state_machine.nested.add_transition(OperationalState::Ready,
                                         OperationalState::Boosting,
@@ -255,14 +229,8 @@ void Board::initialize_state_machine() {
 
     state_machine.nested.add_enter_action(
         [&]() {
-            ethernet.precharge_filter_order.clear_receive_flag();
-            ethernet.send_state();
-        },
-        OperationalState::Precharge);
-
-    state_machine.nested.add_enter_action(
-        [&]() {
             dc_poles_ready = false;
+            ethernet.enable_booster.clear_receive_flag();
             ethernet.send_state();
         },
         OperationalState::Ready);

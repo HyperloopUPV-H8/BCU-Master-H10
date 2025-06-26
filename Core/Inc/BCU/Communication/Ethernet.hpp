@@ -72,6 +72,7 @@ class Ethernet {
         &configure_commutation_parameters.commutation_frequency_hz,
         &configure_commutation_parameters.dead_time_ns,
     };
+    PolledOrder<21711> enable_booster;
 
     struct {
         double duty_cycle_u{0.0f};
