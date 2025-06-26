@@ -47,7 +47,6 @@ class Ethernet {
     PolledOrder<21704> test_space_vector_order{
         &space_vector_parameters.modulation_index,
         &space_vector_parameters.modulation_frequency_hz,
-        &space_vector_parameters.linear_speed,
     };
 
     PolledOrder<21705> emulate_current_control_order{
@@ -83,7 +82,6 @@ class Ethernet {
     struct {
         double modulation_index{0.0f};
         double modulation_frequency_hz{0.0f};
-        double linear_speed{0.0f};
     } space_vector_parameters;
 
     struct {

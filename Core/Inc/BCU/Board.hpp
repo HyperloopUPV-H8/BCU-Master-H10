@@ -32,11 +32,14 @@ class Board {
     using GeneralState = Shared::State::SharedStateMachine::GeneralState;
     using OperationalState = Shared::State::SharedStateMachine::NestedState;
 
+    constexpr static double MIN_SPEED_FOR_BOOSTER{0.1};
+
     volatile bool should_update_low_frequency{false};
     volatile bool should_send_data_1khz{false};
     volatile bool should_send_data_60hz{false};
     volatile bool should_read_temperature{false};
 
+    bool dc_poles_requested{false};
     volatile bool dc_poles_ready{false};
 
     Shared::State::SharedStateMachine state_machine;

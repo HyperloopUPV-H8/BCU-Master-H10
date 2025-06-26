@@ -101,6 +101,26 @@ class SPI {
     SPIStackOrder *encoder_order;
     SPIStackOrder *detailed_encoder_order;
 
+    float requested_u{0.0f};
+    float requested_v{0.0f};
+    float requested_w{0.0f};
+
+    SPIStackOrder *test_pwm_order;
+
+    float requested_i_mod{0.0f};
+    float requested_mod_freq{0.0f};
+
+    SPIStackOrder *test_space_vector_order;
+
+    float requested_current_d{0.0f};
+    float requested_current_q{0.0f};
+
+    SPIStackOrder *enable_current_control_order;
+
+    float requested_speed{0.0f};
+
+    SPIStackOrder *enable_speed_control_order;
+
    public:
     SPI(::SPI::Peripheral &peripheral, StateMachine::state_id *general_state,
         StateMachine::state_id *operational_state);
@@ -109,6 +129,11 @@ class SPI {
 
     bool sync_state();
     bool sync_encoder();
+
+    bool send_test_pwm(float duty_u, float duty_v, float duty_w);
+    bool send_test_space_vector(float i_mod, float mod_freq);
+    bool send_enable_current_control(float current_ref);
+    bool send_enable_speed_control(float speed_ref);
 };
 
 };  // namespace BCU::Communication
