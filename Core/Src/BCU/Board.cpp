@@ -83,7 +83,7 @@ void Board::update() {
 
     if (should_send_data_60hz) {
         should_send_data_60hz = false;
-        ethernet.send_motor_driver_sense();
+        //ethernet.send_motor_driver_sense();
         #if USING_DRIVER_TEMPERATURE || USING_MOTOR_TEMPERATURE
         ethernet.send_temperature_sense();
         #endif
@@ -177,7 +177,9 @@ void Board::initialize_state_machine() {
 
     state_machine.general.add_transition(
         GeneralState::Connecting, GeneralState::Operational,
-        [&]() { return ethernet.is_connected(); });
+        [&]() { 
+            return ethernet.is_connected() && spi.slave_general_state == GeneralState::Operational;
+        });
 
     //     Enter Actions
 
@@ -267,9 +269,9 @@ void Board::initialize_protections() {
         #endif
     }
 
-    add_high_frequency_protection(
-        &spi.slave_general_state,
-        Boundary<StateMachine::state_id, EQUALS>(GeneralState::Fault));
+    // add_high_frequency_protection(
+    //     &spi.slave_general_state,
+    //     Boundary<StateMachine::state_id, EQUALS>(GeneralState::Fault));
 
     protection_manager.start();
 }
