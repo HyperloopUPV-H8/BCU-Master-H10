@@ -21,9 +21,9 @@ class ProtectionManagerHandle {
 
 class STLIBHandle {
    public:
-    STLIBHandle(string mac = "00:80:e1:00:00:00", string ip = "192.168.1.4",
+    STLIBHandle(string mac = "00:80:e1:00:00:00", string ip = "192.168.2.17",
                 string subnet_mask = "255.255.0.0",
-                string gateway = "192.168.1.1",
+                string gateway = "192.168.0.1",
                 UART::Peripheral &printf_peripheral = UART::uart2);
     void update();
 };
