@@ -26,7 +26,7 @@ class Ethernet {
 
     inline static const IPV4 master_ip{"192.168.0.9"};
     inline static const uint16_t master_data_port{50400};
-    inline static const uint16_t master_command_port{50501};
+    inline static const uint16_t master_command_port{50500};
 
     inline static const IPV4 lcu_ip{"192.168.1.4"};
     inline static const uint16_t lcu_command_source_port{50502};
