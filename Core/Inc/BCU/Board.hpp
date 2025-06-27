@@ -55,6 +55,8 @@ class Board {
     Communication::SPI spi{::SPI::spi3, &state_machine.general.current_state,
                            &state_machine.nested.current_state};
 
+    STLIBHandle stlib;
+
     Communication::Ethernet ethernet{
         Communication::Ethernet::CommutationDetailsData{
             .duty_cycle_u{&spi.duty_cycle_u},
@@ -151,7 +153,6 @@ class Board {
         },
     };
 
-    STLIBHandle stlib;
 
     void initialize_state_machine();
     void initialize_protections();
